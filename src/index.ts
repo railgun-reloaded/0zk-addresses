@@ -35,9 +35,6 @@ const parse = (address: RailgunAddressLike): AddressData | undefined => {
     // Hexlify data
     const data = hexlify(bech32m.fromWords(decoded.words));
 
-    console.log("DECODED OBJ", decoded);
-    console.log("DATA DECODED", data);
-
     // Get version
     const version = parseInt(data.slice(0, 2), 16);
     const masterPublicKey = hexToBigInt(data.slice(2, 66));
@@ -57,10 +54,9 @@ const parse = (address: RailgunAddressLike): AddressData | undefined => {
       chain,
     };
 
-    console.log("DECODED RESULT", result);
     return result;
   } catch (error) {
-    console.log(error);
+    console.error(error);
   }
   // TODO: throw error here instead of returning undefined.
   return undefined;
