@@ -1,4 +1,11 @@
-import { formatToByteLength, hexlify, xor } from "./bytes";
+import {
+  formatToByteLength,
+  hexlify,
+  hexStringToUint8Array,
+  uint8ArrayToHex,
+  utf8StringToUint8Array,
+  xor,
+} from "./bytes";
 import { ALL_CHAINS_NETWORK_ID } from "./constants";
 import { Chain, ByteLength } from "./types";
 
@@ -65,10 +72,15 @@ export const chainToNetworkID = (chain: Optional<Chain>): string => {
  * @returns - chainID XOR'd with 'railgun' to make address prettier
  */
 export const xorNetworkID = (chainID: string) => {
-  const chainIDBuffer = Buffer.from(chainID, "hex");
-  const railgunBuffer = Buffer.from("railgun", "utf8");
+  const chainIDBuffer = hexStringToUint8Array(chainID);
+  const railgunBuffer = utf8StringToUint8Array("railgun");
 
   const xorOutput = xor(chainIDBuffer, railgunBuffer);
 
-  return xorOutput.toString("hex");
+  console.log("output", xorOutput);
+
+  const hex = uint8ArrayToHex(xorOutput);
+  console.log("hex", hex);
+
+  return uint8ArrayToHex(xorOutput);
 };

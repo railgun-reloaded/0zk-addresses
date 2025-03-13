@@ -11,6 +11,7 @@ import {
   formatToByteLength,
   hexlify,
   hexStringToBytes,
+  hexStringToUint8Array,
   hexToBigInt,
   nToHex,
 } from "./bytes";
@@ -20,6 +21,7 @@ import { xorNetworkID, networkIDToChain, chainToNetworkID } from "./chain";
  * @param address - RAILGUN encoded address like string
  * @returns {AddressData}
  */
+
 const parse = (address: RailgunAddressLike): AddressData | undefined => {
   try {
     if (!address) {
@@ -85,7 +87,7 @@ const stringify = (addressData: AddressData): string => {
   const addressString = `${version}${masterPublicKey}${networkID}${viewingPublicKey}`;
 
   // Create 73 byte address buffer
-  const addressBuffer = Buffer.from(addressString, "hex");
+  const addressBuffer = hexStringToUint8Array(addressString);
 
   // Encode address
   const address = bech32m.encode(

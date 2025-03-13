@@ -112,7 +112,7 @@ export const hexToBytes = (data: string) => {
 
 export const xor = (a: Uint8Array, b: Uint8Array) => {
   var length = Math.max(a.length, b.length);
-  var buffer = Buffer.allocUnsafe(length);
+  var buffer = new Uint8Array(length);
 
   for (var i = 0; i < length; ++i) {
     // Since the value can be undefined due to different lengths we default to 0, xor of 0 is the same value
@@ -254,4 +254,32 @@ export const nToHex = (
   if (n < 0) throw new Error("bigint must be positive");
   const hex = formatToByteLength(n.toString(16), byteLength, prefix);
   return prefix ? prefix0x(hex) : hex;
+};
+
+export const hexStringToUint8Array = (hexString: string) => {
+  const bytes = [];
+  for (let i = 0; i < hexString.length; i += 2) {
+    bytes.push(parseInt(hexString.substr(i, 2), 16));
+  }
+  return new Uint8Array(bytes);
+};
+
+export const utf8StringToUint8Array = (utf8String: string): Uint8Array => {
+  const encoder = new TextEncoder();
+  const string = encoder.encode(utf8String);
+  return string;
+};
+
+const HEX_CHARACTER_ARRAY = "0123456789abcdef".split("");
+
+export const uint8ArrayToHex = (buffer: Uint8Array) => {
+  let out = "";
+  for (let idx = 0; idx < buffer.length; idx++) {
+    let n = buffer[idx] ?? 0;
+
+    out += `${HEX_CHARACTER_ARRAY[(n >>> 4) & 0xf]}${
+      HEX_CHARACTER_ARRAY[n & 0xf]
+    }`;
+  }
+  return out;
 };
