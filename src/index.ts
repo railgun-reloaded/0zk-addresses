@@ -1,8 +1,3 @@
-// @railgun-reloaded/addresses
-// .parse(addressStr): Address
-// Address format: 0zk1 masterPublicKey networkInfo viewingKey checksum
-// .stringify({ masterPublicKey, viewingKey, chainType, chainId }): string
-
 import {
   ADDRESS_LENGTH_LIMIT,
   ADDRESS_VERSION,

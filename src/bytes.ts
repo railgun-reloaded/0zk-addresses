@@ -1,12 +1,24 @@
 import { type ByteLength, type BytesData } from "./types";
 
-// returns true if string is prefixed with '0x'
+/**
+ * The function `isPrefixed` checks if a given string starts with "0x" and returns a boolean value.
+ * @param {string} str - A string that you want to check if it starts with "0x".
+ */
 export const isPrefixed = (str: string): boolean => str.startsWith("0x");
-// add 0x if it str isn't already prefixed
+
+/**
+ * The function `prefix0x` adds a '0x' prefix to a string if it is not already prefixed.
+ * @param {string} str - A string value that may or may not be prefixed with "0x".
+ */
 export const prefix0x = (str: string): string =>
   isPrefixed(str) ? str : `0x${str}`;
 
-// remove 0x prefix if it exists
+/**
+ * The `strip0x` function removes the "0x" prefix from a given string if it is present.
+ * @param {string} str - The `str` parameter is a string that may or may not have a "0x" prefix at the
+ * beginning. The function `strip0x` is designed to remove the "0x" prefix if it exists in the input
+ * string.
+ */
 export const strip0x = (str: string): string =>
   isPrefixed(str) ? str.slice(2) : str;
 

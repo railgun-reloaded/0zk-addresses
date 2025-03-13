@@ -3,8 +3,10 @@ node_modules
 src/**/*.js
 test/**/*.js
 
-
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
 .DS_Store
+
+# Build files
+tsconfig.tsbuildinfo

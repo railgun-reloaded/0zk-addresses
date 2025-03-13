@@ -5,7 +5,7 @@
   "main": "build/index.js",
   "scripts": {
     "build": "tsc",
-    "test": "npm run build && node --test --test-only ./test/index.js"
+    "test": "npm run build && node --test --test-only ./test/index.test.js"
   },
   "author": "RAILGUN Project Contributors",
   "license": "MIT",
