@@ -1,5 +1,5 @@
-import { ADDRESS_LENGTH_LIMIT, ADDRESS_VERSION, PREFIX } from "./constants";
 import { bech32m } from "@scure/base";
+import { ADDRESS_LENGTH_LIMIT, ADDRESS_VERSION, PREFIX } from "./constants";
 import {
   ByteLength,
   type AddressData,
