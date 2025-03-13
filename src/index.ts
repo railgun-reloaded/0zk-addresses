@@ -73,7 +73,7 @@ const parse = (address: RailgunAddressLike): AddressData | undefined => {
  * Bech32 encodes address
  * @param addressData - AddressData to encode
  */
-const stringify = (addressData: AddressData): string => {
+const stringify = (addressData: AddressData): RailgunAddressLike => {
   const masterPublicKey = nToHex(
     addressData.masterPublicKey,
     ByteLength.UINT_256,
