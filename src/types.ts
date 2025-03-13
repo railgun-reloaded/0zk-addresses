@@ -8,7 +8,8 @@ export type Chain = {
 };
 
 // TODO: somehow use PREFIX from constants.ts
-export type RailgunAddressLike = `${string}1${string}`; //| `0zk${string}` ;
+
+export type RailgunAddressLike = `0zk1${string}`;
 
 export type AddressData = {
   masterPublicKey: bigint;
