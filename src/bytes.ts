@@ -115,7 +115,7 @@ export const xor = (a: Uint8Array, b: Uint8Array) => {
   var buffer = Buffer.allocUnsafe(length);
 
   for (var i = 0; i < length; ++i) {
-    // value can be undefined
+    // Since the value can be undefined due to different lengths we default to 0, xor of 0 is the same value
     const av = a[i] ?? 0;
     const bv = b[i] ?? 0;
     buffer[i] = av ^ bv;
@@ -191,7 +191,6 @@ export const padToLength = (
     }
   }
 
-  // Return dataArray
   return dataArray;
 };
 
