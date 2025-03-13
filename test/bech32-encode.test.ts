@@ -57,7 +57,6 @@ describe("bech32-encode2", () => {
         version: vector.version,
       };
       const encoded = stringify(addressData);
-      console.log("encoded", encoded);
       expect(encoded).toBe(vector.address);
       expect(encoded.length).toBe(ADDRESS_LENGTH_LIMIT);
       expect(parse(encoded as RailgunAddressLike)).toMatchObject(addressData);
