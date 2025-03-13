@@ -37,13 +37,13 @@ describe.only("Full test suit", () => {
   });
 
   it("should stringify an address", { only: true }, () => {
-    const stringifiedAddress = stringify(originalDecodedAddress);
+    const stringifiedAddress: string = stringify(originalDecodedAddress);
 
     assert(originalAddress === stringifiedAddress, "ADDRESS MATCH");
   });
 
   it("should parse and address", { only: true }, () => {
-    const parsedAddress = parse(originalAddress);
+    const parsedAddress: Optional<AddressData> = parse(originalAddress);
 
     if (isDefined(parsedAddress)) {
       // TODO: Check if the method use to check if both objects are equal

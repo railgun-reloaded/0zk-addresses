@@ -1,5 +1,5 @@
 {
-  "name": "@railgun-reloaded/addresses",
+  "name": "@railgun-reloaded/0zk-addresses",
   "version": "1.0.0",
   "description": "A simple module for encoding and decoding railgun formatted addresses",
   "main": "build/index.js",
