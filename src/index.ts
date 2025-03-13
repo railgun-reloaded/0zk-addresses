@@ -1,9 +1,4 @@
-import {
-  ADDRESS_LENGTH_LIMIT,
-  ADDRESS_VERSION,
-  ALL_CHAINS_NETWORK_ID,
-  PREFIX,
-} from "./constants";
+import { ADDRESS_LENGTH_LIMIT, ADDRESS_VERSION, PREFIX } from "./constants";
 import { bech32m } from "@scure/base";
 import {
   ByteLength,
@@ -17,58 +12,8 @@ import {
   hexStringToBytes,
   hexToBigInt,
   nToHex,
-  xor,
 } from "./bytes";
-
-const getChainFullNetworkID = (chain: Chain): string => {
-  // 1 byte: chainType.
-  const formattedChainType = formatToByteLength(
-    hexlify(chain.type),
-    ByteLength.UINT_8
-  );
-  // 7 bytes: chainID.
-  const formattedChainID = formatToByteLength(
-    hexlify(chain.id),
-    ByteLength.UINT_56
-  );
-  return `${formattedChainType}${formattedChainID}`;
-};
-
-export const networkIDToChain = (networkID: string): Optional<Chain> => {
-  if (networkID === ALL_CHAINS_NETWORK_ID) {
-    return undefined;
-  }
-
-  const chain: Chain = {
-    type: parseInt(networkID.slice(0, 2), 16),
-    id: parseInt(networkID.slice(2, 16), 16),
-  };
-  return chain;
-};
-
-const chainToNetworkID = (chain: Optional<Chain>): string => {
-  if (chain == null) {
-    return ALL_CHAINS_NETWORK_ID;
-  }
-
-  const networkID = getChainFullNetworkID(chain);
-  return networkID;
-};
-
-/**
- * @param chainID - hex value of chainID
- * @returns - chainID XOR'd with 'railgun' to make address prettier
- */
-const xorNetworkID = (chainID: string) => {
-  const chainIDBuffer = Buffer.from(chainID, "hex");
-  const railgunBuffer = Buffer.from("railgun", "utf8");
-
-  const xorOutput = xor(chainIDBuffer, railgunBuffer);
-
-  console.log("xorOutput", xorOutput);
-
-  return xorOutput.toString("hex");
-};
+import { xorNetworkID, networkIDToChain, chainToNetworkID } from "./chain";
 
 /**
  * @param address - RAILGUN encoded address like string
