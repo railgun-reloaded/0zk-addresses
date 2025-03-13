@@ -1,6 +1,5 @@
 import { bech32m } from "@scure/base";
 import { ADDRESS_LENGTH_LIMIT, ADDRESS_VERSION, PREFIX } from "./constants";
-
 import {
   ByteLength,
   type AddressData,
@@ -22,7 +21,7 @@ import { xorNetworkID, networkIDToChain, chainToNetworkID } from "./chain";
  * @returns {AddressData}
  */
 
-const parse = (address: RailgunAddressLike): AddressData | undefined => {
+const parse = (address: RailgunAddressLike): AddressData => {
   try {
     if (!address) {
       throw new Error("Error: No address input.");

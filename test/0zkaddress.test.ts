@@ -47,19 +47,20 @@ describe("bech32-encode2", () => {
         version: 1,
       },
     ];
-    for (const [_, vector] of vectors.entries()) {
+    for (const [_, { pubkey, chain, version, address }] of vectors.entries()) {
       const addressData: AddressData = {
-        masterPublicKey: hexToBigInt(vector.pubkey),
+        masterPublicKey: hexToBigInt(pubkey),
         viewingPublicKey: hexStringToBytes(
-          formatToByteLength(vector.pubkey, ByteLength.UINT_256, false)
+          formatToByteLength(pubkey, ByteLength.UINT_256, false)
         ),
-        chain: vector.chain,
-        version: vector.version,
+        chain,
+        version,
       };
-      const encoded: RailgunAddressLike = stringify(addressData);
-      expect(encoded).toBe(vector.address);
-      expect(encoded.length).toBe(ADDRESS_LENGTH_LIMIT);
-      expect(parse(encoded)).toMatchObject(addressData);
+
+      const encodedAddress: RailgunAddressLike = stringify(addressData);
+      expect(encodedAddress).toBe(address);
+      expect(encodedAddress.length).toBe(ADDRESS_LENGTH_LIMIT);
+      expect(parse(encodedAddress)).toMatchObject(addressData);
     }
   });
 

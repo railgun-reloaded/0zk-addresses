@@ -7,8 +7,6 @@ export type Chain = {
   type: ChainType;
 };
 
-// TODO: somehow use PREFIX from constants.ts
-
 export type RailgunAddressLike = `0zk1${string}`;
 
 export type AddressData = {

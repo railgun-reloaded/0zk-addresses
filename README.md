@@ -1,17 +1,16 @@
-# `@railgun-reloaded/0zk-adresses`
+# `@railgun-reloaded/0zk-addresses`
 
 > A simple module for encoding nd decoding RAILGUN formatted addresses
 
 ## Example Usage
 
 ```ts
-// Using parse()
+// Using parse() to decode
 const originalAddress: RailgunAddressLike =
   "0zk1q8hxknrs97q8pjxaagwthzc0df99rzmhl2xnlxmgv9akv32sua0kfrv7j6fe3z53llhxknrs97q8pjxaagwthzc0df99rzmhl2xnlxmgv9akv32sua0kg0zpzts";
-const parsedAddress: Optional<AddressData> = parse(originalAddress);
-console.log("parsedAddress: ", parsedAddress);
+const parsedAddress: AddressData = parse(originalAddress);
 
-// Using stringify()
+// Using stringify() to encode
 const originalDecodedAddress: AddressData = {
   masterPublicKey:
     107840038155987585452015163184318756879563730268045790440630167370538141835108n,
@@ -22,8 +21,9 @@ const originalDecodedAddress: AddressData = {
   version: 1,
   chain: undefined,
 };
-const stringifiedAddress: string = stringify(originalDecodedAddress);
-console.log("stringifiedAddress: ", stringifiedAddress);
+const stringifiedAddress: RailgunAddressLike = stringify(
+  originalDecodedAddress
+);
 ```
 
 ## Install
