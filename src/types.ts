@@ -18,10 +18,6 @@ export type AddressData = {
 
 export type BytesData = bigint | number | ArrayLike<number> | string;
 
-export const isDefined = <T>(a: T | undefined | null): a is T => {
-  return typeof a !== "undefined" && a !== null;
-};
-
 export enum ByteLength {
   UINT_8 = 1,
   UINT_56 = 7,
