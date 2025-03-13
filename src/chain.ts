@@ -74,13 +74,7 @@ export const chainToNetworkID = (chain: Optional<Chain>): string => {
 export const xorNetworkID = (chainID: string) => {
   const chainIDBuffer = hexStringToUint8Array(chainID);
   const railgunBuffer = utf8StringToUint8Array("railgun");
-
   const xorOutput = xor(chainIDBuffer, railgunBuffer);
-
-  console.log("output", xorOutput);
-
-  const hex = uint8ArrayToHex(xorOutput);
-  console.log("hex", hex);
 
   return uint8ArrayToHex(xorOutput);
 };

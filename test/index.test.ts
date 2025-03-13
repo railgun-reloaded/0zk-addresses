@@ -17,8 +17,8 @@ const originalDecodedAddress: AddressData = {
   chain: undefined,
 };
 
-describe.only("Full test suit", () => {
-  it("should parse and stringify an address", { only: true }, () => {
+describe("Full test suit", () => {
+  it("should parse and stringify an address", () => {
     const parsedAddress: Optional<AddressData> = parse(originalAddress);
 
     if (isDefined(parsedAddress)) {
@@ -36,13 +36,13 @@ describe.only("Full test suit", () => {
     }
   });
 
-  it("should stringify an address", { only: true }, () => {
+  it("should stringify an address", () => {
     const stringifiedAddress: string = stringify(originalDecodedAddress);
 
     assert(originalAddress === stringifiedAddress, "ADDRESS MATCH");
   });
 
-  it("should parse and address", { only: true }, () => {
+  it("should parse and address", () => {
     const parsedAddress: Optional<AddressData> = parse(originalAddress);
 
     if (isDefined(parsedAddress)) {

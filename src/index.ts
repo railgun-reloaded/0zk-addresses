@@ -58,10 +58,15 @@ const parse = (address: RailgunAddressLike): AddressData | undefined => {
 
     return result;
   } catch (error) {
-    console.error(error);
+    if (
+      error instanceof Error &&
+      error.message &&
+      error.message.includes("Invalid checksum")
+    ) {
+      throw new Error("Invalid checksum");
+    }
+    throw new Error("Failed to decode bech32 address");
   }
-  // TODO: throw error here instead of returning undefined.
-  return undefined;
 };
 
 /**
