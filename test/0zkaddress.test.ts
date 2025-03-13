@@ -56,17 +56,17 @@ describe("bech32-encode2", () => {
         chain: vector.chain,
         version: vector.version,
       };
-      const encoded = stringify(addressData);
+      const encoded: RailgunAddressLike = stringify(addressData);
       expect(encoded).toBe(vector.address);
       expect(encoded.length).toBe(ADDRESS_LENGTH_LIMIT);
-      expect(parse(encoded as RailgunAddressLike)).toMatchObject(addressData);
+      expect(parse(encoded)).toMatchObject(addressData);
     }
   });
 
   it("Should throw error on invalid address checksum", () => {
     expect(() => {
       parse(
-        "rgany1pnj7u66vwqhcquxgmh4pewutpa4y55vtwlag60umdpshkej92rn47ey76ges3t3enn"
+        "0zk1pnj7u66vwqhcquxgmh4pewutpa4y55vtwlag60umdpshkej92rn47ey76ges3t3enn"
       );
     }).toThrowError("Invalid checksum");
   });
@@ -74,7 +74,7 @@ describe("bech32-encode2", () => {
   it("Should throw error on invalid address prefix", () => {
     expect(() => {
       parse(
-        "rg1qyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqunpd9kxwatwqyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqsfhuuw"
+        "0zk1rgqyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqunpd9kxwatwqyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqsfhuuw"
       );
     }).toThrowError("Failed to decode bech32 address");
   });
