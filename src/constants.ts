@@ -1,0 +1,6 @@
+export const ADDRESS_VERSION = 1;
+const ADDRESS_LENGTH_LIMIT = 127;
+const ALL_CHAINS_NETWORK_ID = "ffffffffffffffff";
+const PREFIX = "0zk";
+
+export { ADDRESS_LENGTH_LIMIT, ALL_CHAINS_NETWORK_ID, PREFIX };
