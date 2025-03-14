@@ -59,7 +59,7 @@ export const networkIDToChain = (networkID: Uint8Array): Chain => {
  */
 export const chainToNetworkID = (chain: Optional<Chain>): Uint8Array => {
   if (chain == null) {
-    return ALL_CHAINS_NETWORK_ID.slice();
+    return ALL_CHAINS_NETWORK_ID;
   }
 
   const networkID = getChainFullNetworkID(chain);
