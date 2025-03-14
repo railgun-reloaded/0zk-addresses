@@ -49,10 +49,10 @@ describe("bech32-encode2", () => {
     ];
     for (const [_, { pubkey, chain, version, address }] of vectors.entries()) {
       const addressData: AddressData = {
-        masterPublicKey: hexToBigInt(pubkey),
+        masterPublicKey: hexToBigInt(pubkey), // Uint8Array
         viewingPublicKey: hexStringToBytes(
           formatToByteLength(pubkey, ByteLength.UINT_256, false)
-        ),
+        ), // Uint8Array
         chain,
         version,
       };
