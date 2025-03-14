@@ -34,9 +34,14 @@ const parse = (address: RailgunAddressLike): AddressData => {
 
     // Get version
     const version = data[0]!;
-    const masterPublicKey = data.subarray(1, 65); // TEST THIS LATER
-    const networkID = data.subarray(65, 81); // TEST THIS LATER
-    const viewingPublicKey = data.subarray(81, 145); // TEST THIS LATER
+    console.log("version", version);
+    const masterPublicKey = data.subarray(1, 33); // TEST THIS LATER
+    console.log("masterPublicKey", masterPublicKey);
+    const networkID = data.subarray(33, 41); // TEST THIS LATER
+
+    console.log("NETWRKID", networkID);
+    console.log("DATA", data);
+    const viewingPublicKey = data.subarray(41, 73); // TEST THIS LATER
 
     const chain: Optional<Chain> = networkIDToChain(networkID);
 
