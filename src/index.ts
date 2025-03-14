@@ -25,11 +25,11 @@ const parse = (address: RailgunAddressLike): AddressData => {
       throw new Error("Invalid address length");
     }
 
-    // Get version
-    const version = data[0]!;
-    const masterPublicKey = data.subarray(1, 65); // TEST THIS LATER
-    const networkID = data.subarray(65, 81); // TEST THIS LATER
-    const viewingPublicKey = data.subarray(81, 145); // TEST THIS LATER
+    // Create variables for AddressData from the decoded data
+    const version = data[0]!; // 1 byte
+    const masterPublicKey = data.subarray(1, 33); // 32 bytes
+    const networkID = data.subarray(33, 41); // 8 bytes
+    const viewingPublicKey = data.subarray(41, 73); // 32 bytes
 
     const chain: Optional<Chain> = networkIDToChain(networkID);
 
@@ -45,15 +45,15 @@ const parse = (address: RailgunAddressLike): AddressData => {
     };
 
     return result;
-  } catch (error) {
+  } catch (cause) {
     if (
-      error instanceof Error &&
-      error.message &&
-      error.message.includes("Invalid checksum")
+      cause instanceof Error &&
+      cause.message &&
+      cause.message.includes("Invalid checksum")
     ) {
       throw new Error("Invalid checksum");
     }
-    throw new Error("Failed to decode bech32 address");
+    throw new Error("Failed to decode bech32 address", { cause });
   }
 };
 
@@ -70,10 +70,10 @@ const stringify = ({
   const addressBuffer = new Uint8Array(73);
   const networkID = chainToNetworkID(chain);
 
-  addressBuffer[0] = 0x01; // Version "01"
-  addressBuffer.set(masterPublicKey, 1);
-  addressBuffer.set(networkID, 33);
-  addressBuffer.set(viewingPublicKey, 41);
+  addressBuffer[0] = 0x01; // Version "01" 1 byte
+  addressBuffer.set(masterPublicKey, 1); // 32 bytes
+  addressBuffer.set(networkID, 33); // 8 bytes
+  addressBuffer.set(viewingPublicKey, 41); // 32 bytes
 
   // Encode address
   const address = bech32m.encode(

@@ -30,19 +30,22 @@ const getChainFullNetworkID = ({ type, id }: Chain): Uint8Array => {
  * `Chain` object with `type` and `id` properties based on the provided `networkID` and returns that
  * `Chain` object.
  */
-export const networkIDToChain = (networkID: Uint8Array): Optional<Chain> => {
-  if (networkID === ALL_CHAINS_NETWORK_ID) {
-    return undefined;
-  }
 
+export const networkIDToChain = (networkID: Uint8Array): Chain => {
   // We xor the networkID with the RAILGUN_ASCII to decode the chain type and ID.
   const xorNetwork = xorRailgun(networkID);
+  const dataViewNetwork = new DataView(xorNetwork.buffer);
+  const bigIntDataNetwork = dataViewNetwork.getBigUint64(0, false);
 
-  const dataView = new DataView(xorNetwork.buffer);
-  const type = xorNetwork[0]!;
-  const id = Number(dataView.getBigUint64(1, false));
+  /**
+   * Extracts the chain type and ID from the decoded network identifier.
+   * The chain type is determined by the most significant byte (shifted right by 56 bits),
+   * and the chain ID is extracted from the remaining 56 bits using a bitwise AND operation.
+   */
+  const type = Number(bigIntDataNetwork >> 56n);
+  const id = Number(bigIntDataNetwork & 0x00ff_ffff_ffff_ffffn);
+
   const chain: Chain = { type, id };
-
   return chain;
 };
 
