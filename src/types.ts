@@ -1,5 +1,6 @@
 export enum ChainType {
   EVM = 0,
+  ANY = 255,
 }
 
 export type Chain = {
@@ -10,7 +11,7 @@ export type Chain = {
 export type RailgunAddressLike = `0zk1${string}`;
 
 export type AddressData = {
-  masterPublicKey: bigint;
+  masterPublicKey: Uint8Array;
   viewingPublicKey: Uint8Array;
   chain?: Optional<Chain>;
   version?: Optional<number>;

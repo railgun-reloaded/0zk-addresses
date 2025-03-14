@@ -1,46 +1,40 @@
 import { bech32m } from "@scure/base";
-import { ADDRESS_LENGTH_LIMIT, ADDRESS_VERSION, PREFIX } from "./constants";
+import { type AddressData, type Chain, type RailgunAddressLike } from "./types";
+import { networkIDToChain, chainToNetworkID, xorRailgun } from "./chain";
 import {
-  ByteLength,
-  type AddressData,
-  type Chain,
-  type RailgunAddressLike,
-} from "./types";
-import {
-  formatToByteLength,
-  hexlify,
-  hexStringToBytes,
-  hexStringToUint8Array,
-  hexToBigInt,
-  nToHex,
-} from "./bytes";
-import { xorNetworkID, networkIDToChain, chainToNetworkID } from "./chain";
+  ADDRESS_VERSION,
+  ADDRESS_LENGTH_LIMIT,
+  RAILGUN_ADDRESS_PREFIX,
+  CURRENT_ADDRESS_VERSION,
+} from "./constants";
 
 /**
- * @param address - RAILGUN encoded address like string
- * @returns {AddressData}
+ * @param address - The `address` parameter is of type `RailgunAddressLike` and its the encoded RAILGUN  address.
+ * @returns {AddressData} - Returns `addressData` object with the data decoded.
  */
-
 const parse = (address: RailgunAddressLike): AddressData => {
-  try {
-    if (!address) {
-      throw new Error("Error: No address input.");
-    }
+  if (!address) {
+    throw new Error("Error: No address input.");
+  }
 
+  try {
     const decoded = bech32m.decode(address, ADDRESS_LENGTH_LIMIT);
 
-    if (decoded.prefix !== PREFIX) {
+    if (decoded.prefix !== RAILGUN_ADDRESS_PREFIX) {
       throw new Error("Invalid address prefix");
     }
 
-    // Hexlify data
-    const data = hexlify(bech32m.fromWords(decoded.words));
+    const data = bech32m.fromWords(decoded.words);
 
-    // Get version
-    const version = parseInt(data.slice(0, 2), 16);
-    const masterPublicKey = hexToBigInt(data.slice(2, 66));
-    const networkID = xorNetworkID(data.slice(66, 82));
-    const viewingPublicKey = hexStringToBytes(data.slice(82, 146));
+    if (data.byteLength !== 73) {
+      throw new Error("Invalid address length");
+    }
+
+    // Create variables for AddressData from the decoded data
+    const version = data[0]!; // 1 byte
+    const masterPublicKey = data.subarray(1, 33); // 32 bytes
+    const networkID = data.subarray(33, 41); // 8 bytes
+    const viewingPublicKey = data.subarray(41, 73); // 32 bytes
 
     const chain: Optional<Chain> = networkIDToChain(networkID);
 
@@ -56,46 +50,41 @@ const parse = (address: RailgunAddressLike): AddressData => {
     };
 
     return result;
-  } catch (error) {
+  } catch (cause) {
     if (
-      error instanceof Error &&
-      error.message &&
-      error.message.includes("Invalid checksum")
+      cause instanceof Error &&
+      cause.message &&
+      cause.message.includes("Invalid checksum")
     ) {
       throw new Error("Invalid checksum");
     }
-    throw new Error("Failed to decode bech32 address");
+    throw new Error("Failed to decode bech32 address", { cause });
   }
 };
 
 /**
  * Bech32 encodes address
- * @param addressData - AddressData to encode
+ * @param addressData - The `addressData` parameter is of type `AddressData` and its the data to be encoded.
+ * @returns {RailgunAddressLike} - Returns a string that represents the encoded address.
  */
-const stringify = (addressData: AddressData): RailgunAddressLike => {
-  const masterPublicKey = nToHex(
-    addressData.masterPublicKey,
-    ByteLength.UINT_256,
-    false
-  );
-  const viewingPublicKey = formatToByteLength(
-    addressData.viewingPublicKey,
-    ByteLength.UINT_256
-  );
+const stringify = ({
+  masterPublicKey,
+  chain,
+  viewingPublicKey,
+}: AddressData): RailgunAddressLike => {
+  // Create 73 byte address buffer (version || masterPublicKey || networkID || viewingPublicKey)
+  const addressBuffer = new Uint8Array(73);
+  const networkID = chainToNetworkID(chain);
+  const networkIDXor = xorRailgun(networkID);
 
-  const { chain } = addressData;
-  const networkID = xorNetworkID(chainToNetworkID(chain));
-
-  const version = "01";
-
-  const addressString = `${version}${masterPublicKey}${networkID}${viewingPublicKey}`;
-
-  // Create 73 byte address buffer
-  const addressBuffer = hexStringToUint8Array(addressString);
+  addressBuffer[0] = CURRENT_ADDRESS_VERSION; // Version "01" 1 byte
+  addressBuffer.set(masterPublicKey, 1); // 32 bytes
+  addressBuffer.set(networkIDXor, 33); // 8 bytes
+  addressBuffer.set(viewingPublicKey, 41); // 32 bytes
 
   // Encode address
   const address = bech32m.encode(
-    PREFIX,
+    RAILGUN_ADDRESS_PREFIX,
     bech32m.toWords(addressBuffer),
     ADDRESS_LENGTH_LIMIT
   );
