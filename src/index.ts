@@ -1,13 +1,12 @@
 import { bech32m } from "@scure/base";
-import { ADDRESS_LENGTH_LIMIT, ADDRESS_VERSION, PREFIX } from "./constants";
 import {
-  // ByteLength,
-  type AddressData,
-  type Chain,
-  type RailgunAddressLike,
-} from "./types";
+  ADDRESS_LENGTH_LIMIT,
+  ADDRESS_VERSION,
+  CURRENT_ADDRESS_VERSION,
+  PREFIX,
+} from "./constants";
+import { type AddressData, type Chain, type RailgunAddressLike } from "./types";
 import { networkIDToChain, chainToNetworkID, xorRailgun } from "./chain";
-// import { formatUint8ArrayToLength } from "./bytes";
 
 /**
  * @param address - RAILGUN encoded address like string
@@ -78,7 +77,7 @@ const stringify = ({
 
   const networkIDXor = xorRailgun(networkID);
 
-  addressBuffer[0] = 0x01; // Version "01"
+  addressBuffer[0] = CURRENT_ADDRESS_VERSION; // Version "01"
 
   addressBuffer.set(masterPublicKey, 1);
   addressBuffer.set(networkIDXor, 33);
