@@ -1,4 +1,3 @@
-// import { formatUint8ArrayToLength } from "./bytes";
 import { ALL_CHAINS_NETWORK_ID, RAILGUN_ASCII } from "./constants";
 import { Chain } from "./types";
 
@@ -71,7 +70,12 @@ export const chainToNetworkID = (chain: Optional<Chain>): Uint8Array => {
   return networkID;
 };
 
-// TODO: Add documentation
+/**
+ * XORs each byte of the given chainID with the corresponding byte in the RAILGUN_ASCII array.
+ *
+ * @param chainID - A Uint8Array representing the chain ID to be XORed.
+ * @returns A new Uint8Array of length 8 containing the XOR result.
+ */
 export const xorRailgun = (chainID: Uint8Array) => {
   const xorOutput = new Uint8Array(8);
 
