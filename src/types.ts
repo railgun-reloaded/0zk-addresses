@@ -1,5 +1,6 @@
 export enum ChainType {
   EVM = 0,
+  ANY = 255,
 }
 
 export type Chain = {
