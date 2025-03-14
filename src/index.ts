@@ -2,15 +2,15 @@ import { bech32m } from "@scure/base";
 import { type AddressData, type Chain, type RailgunAddressLike } from "./types";
 import { networkIDToChain, chainToNetworkID, xorRailgun } from "./chain";
 import {
-  PREFIX,
   ADDRESS_VERSION,
   ADDRESS_LENGTH_LIMIT,
+  RAILGUN_ADDRESS_PREFIX,
   CURRENT_ADDRESS_VERSION,
 } from "./constants";
 
 /**
- * @param address - RAILGUN encoded address like string
- * @returns {AddressData}
+ * @param address - The `address` parameter is of type `RailgunAddressLike` and its the encoded RAILGUN  address.
+ * @returns {AddressData} - Returns `addressData` object with the data decoded.
  */
 const parse = (address: RailgunAddressLike): AddressData => {
   if (!address) {
@@ -20,7 +20,7 @@ const parse = (address: RailgunAddressLike): AddressData => {
   try {
     const decoded = bech32m.decode(address, ADDRESS_LENGTH_LIMIT);
 
-    if (decoded.prefix !== PREFIX) {
+    if (decoded.prefix !== RAILGUN_ADDRESS_PREFIX) {
       throw new Error("Invalid address prefix");
     }
 
@@ -64,7 +64,8 @@ const parse = (address: RailgunAddressLike): AddressData => {
 
 /**
  * Bech32 encodes address
- * @param addressData - AddressData to encode
+ * @param addressData - The `addressData` parameter is of type `AddressData` and its the data to be encoded.
+ * @returns {RailgunAddressLike} - Returns a string that represents the encoded address.
  */
 const stringify = ({
   masterPublicKey,
@@ -83,7 +84,7 @@ const stringify = ({
 
   // Encode address
   const address = bech32m.encode(
-    PREFIX,
+    RAILGUN_ADDRESS_PREFIX,
     bech32m.toWords(addressBuffer),
     ADDRESS_LENGTH_LIMIT
   );
