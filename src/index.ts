@@ -1,46 +1,35 @@
 import { bech32m } from "@scure/base";
 import { ADDRESS_LENGTH_LIMIT, ADDRESS_VERSION, PREFIX } from "./constants";
-import {
-  ByteLength,
-  type AddressData,
-  type Chain,
-  type RailgunAddressLike,
-} from "./types";
-import {
-  formatToByteLength,
-  hexlify,
-  hexStringToBytes,
-  hexStringToUint8Array,
-  hexToBigInt,
-  nToHex,
-} from "./bytes";
-import { xorNetworkID, networkIDToChain, chainToNetworkID } from "./chain";
+import { type AddressData, type Chain, type RailgunAddressLike } from "./types";
+import { networkIDToChain, chainToNetworkID } from "./chain";
 
 /**
  * @param address - RAILGUN encoded address like string
  * @returns {AddressData}
  */
-
 const parse = (address: RailgunAddressLike): AddressData => {
-  try {
-    if (!address) {
-      throw new Error("Error: No address input.");
-    }
+  if (!address) {
+    throw new Error("Error: No address input.");
+  }
 
+  try {
     const decoded = bech32m.decode(address, ADDRESS_LENGTH_LIMIT);
 
     if (decoded.prefix !== PREFIX) {
       throw new Error("Invalid address prefix");
     }
 
-    // Hexlify data
-    const data = hexlify(bech32m.fromWords(decoded.words));
+    const data = bech32m.fromWords(decoded.words);
+
+    if (data.byteLength !== 73) {
+      throw new Error("Invalid address length");
+    }
 
     // Get version
-    const version = parseInt(data.slice(0, 2), 16);
-    const masterPublicKey = hexToBigInt(data.slice(2, 66));
-    const networkID = xorNetworkID(data.slice(66, 82));
-    const viewingPublicKey = hexStringToBytes(data.slice(82, 146));
+    const version = data[0]!;
+    const masterPublicKey = data.subarray(1, 65); // TEST THIS LATER
+    const networkID = data.subarray(65, 81); // TEST THIS LATER
+    const viewingPublicKey = data.subarray(81, 145); // TEST THIS LATER
 
     const chain: Optional<Chain> = networkIDToChain(networkID);
 
@@ -72,26 +61,19 @@ const parse = (address: RailgunAddressLike): AddressData => {
  * Bech32 encodes address
  * @param addressData - AddressData to encode
  */
-const stringify = (addressData: AddressData): RailgunAddressLike => {
-  const masterPublicKey = nToHex(
-    addressData.masterPublicKey,
-    ByteLength.UINT_256,
-    false
-  );
-  const viewingPublicKey = formatToByteLength(
-    addressData.viewingPublicKey,
-    ByteLength.UINT_256
-  );
+const stringify = ({
+  masterPublicKey,
+  chain,
+  viewingPublicKey,
+}: AddressData): RailgunAddressLike => {
+  // Create 73 byte address buffer (version || masterPublicKey || networkID || viewingPublicKey)
+  const addressBuffer = new Uint8Array(73);
+  const networkID = chainToNetworkID(chain);
 
-  const { chain } = addressData;
-  const networkID = xorNetworkID(chainToNetworkID(chain));
-
-  const version = "01";
-
-  const addressString = `${version}${masterPublicKey}${networkID}${viewingPublicKey}`;
-
-  // Create 73 byte address buffer
-  const addressBuffer = hexStringToUint8Array(addressString);
+  addressBuffer[0] = 0x01; // Version "01"
+  addressBuffer.set(masterPublicKey, 1);
+  addressBuffer.set(networkID, 33);
+  addressBuffer.set(viewingPublicKey, 41);
 
   // Encode address
   const address = bech32m.encode(
