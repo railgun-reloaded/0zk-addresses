@@ -1,7 +1,6 @@
 // import { formatUint8ArrayToLength } from "./bytes";
-import { formatUint8ArrayToLength } from "./bytes";
 import { ALL_CHAINS_NETWORK_ID, RAILGUN_ASCII } from "./constants";
-import { ByteLength, Chain } from "./types";
+import { Chain } from "./types";
 
 /**
  * The function `getChainFullNetworkID` formats a chain's type and ID into a full network ID string.
@@ -12,26 +11,14 @@ import { ByteLength, Chain } from "./types";
  */
 const getChainFullNetworkID = ({ type, id }: Chain): Uint8Array => {
   const networkBuf = new Uint8Array(8);
-  // const dataView = new DataView(networkBuf.buffer);
-
-  const typeArray = new Uint8Array(1);
-  const idArray = new Uint8Array(1);
-  typeArray[0] = type;
-  idArray[0] = id;
-  const typeBuffer = formatUint8ArrayToLength(typeArray, ByteLength.UINT_8);
-  const idBuffer = formatUint8ArrayToLength(idArray, ByteLength.UINT_56);
-
-  networkBuf.set(typeBuffer);
-  networkBuf.set(idBuffer, ByteLength.UINT_8);
-
-  // console.log("NETWORKIDb", networkBuf);
+  const dataView = new DataView(networkBuf.buffer);
 
   // 7 bytes: chainID.
   // Set the chain ID as a 7-byte number (56 bits) starting from the 1st byte.
-  // dataView.setBigUint64(0, BigInt(id), false); // false for big-endian
+  dataView.setBigUint64(0, BigInt(id), false); // false for big-endian
 
   // // 1 byte: chainType.
-  // networkBuf[0] = type;
+  networkBuf[0] = type;
 
   return networkBuf;
 };
@@ -45,24 +32,24 @@ const getChainFullNetworkID = ({ type, id }: Chain): Uint8Array => {
  * `Chain` object.
  */
 export const networkIDToChain = (networkID: Uint8Array): Optional<Chain> => {
-  if (networkID === ALL_CHAINS_NETWORK_ID) {
+  // We xor the networkID with the RAILGUN_ASCII to decode the chain type and ID.
+  const xorNetwork = xorRailgun(networkID);
+  let matches = true;
+  for (let i = 0; i < xorNetwork.length; i++) {
+    if (xorNetwork[i] !== ALL_CHAINS_NETWORK_ID[i]) {
+      matches = false;
+    }
+  }
+  if (matches) {
     return undefined;
   }
 
-  // We xor the networkID with the RAILGUN_ASCII to decode the chain type and ID.
-  const xorNetwork = xorRailgun(networkID);
-
-  console.log("Xored", xorNetwork);
-  // const dataView = new DataView(xorNetwork.buffer);
   const type = xorNetwork[0]!;
 
   // Extract the last 7 bytes of the 8-byte value by applying a bitmask.
   // The bitmask 0x00ffffffffffffff ensures that the most significant byte is cleared (set to 0),
   // leaving only the lower 56 bits (7 bytes) of the value.
   const id = Number(xorNetwork.slice(1, 8).join(""));
-  console.log("ID", id);
-  // const id = Number(dataView.getBigUint64(1, false));
-
   const chain: Chain = { type, id };
   return chain;
 };
