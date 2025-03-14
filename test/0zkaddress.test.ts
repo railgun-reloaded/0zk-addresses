@@ -1,6 +1,5 @@
 import { describe, it } from "node:test";
 import {
-  ByteLength,
   ChainType,
   type AddressData,
   type RailgunAddressLike,
@@ -9,13 +8,15 @@ import expect from "expect";
 
 import { parse, stringify } from "../src";
 import { ADDRESS_LENGTH_LIMIT } from "../src/constants";
-import { formatUint8ArrayToLength } from "../src/bytes";
 
 describe("bech32-encode2", () => {
   it("Should encode and decode addresses", () => {
     const vectors = [
       {
-        pubkey: new Uint8Array([0, 0, 0, 0]),
+        pubkey: new Uint8Array([
+          0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+          0, 0, 0, 0, 0, 0, 0, 0, 0,
+        ]),
         chain: { type: ChainType.EVM, id: 1 },
         address:
           "0zk1qyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqunpd9kxwatwqyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqhshkca",
@@ -57,8 +58,8 @@ describe("bech32-encode2", () => {
     ];
     for (const [_, { pubkey, chain, version, address }] of vectors.entries()) {
       const addressData: AddressData = {
-        masterPublicKey: formatUint8ArrayToLength(pubkey, ByteLength.UINT_256),
-        viewingPublicKey: formatUint8ArrayToLength(pubkey, ByteLength.UINT_256),
+        masterPublicKey: pubkey,
+        viewingPublicKey: pubkey,
         chain,
         version,
       };
