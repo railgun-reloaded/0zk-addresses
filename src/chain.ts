@@ -1,13 +1,5 @@
-import {
-  formatToByteLength,
-  hexlify,
-  hexStringToUint8Array,
-  uint8ArrayToHex,
-  utf8StringToUint8Array,
-  xor,
-} from "./bytes";
-import { ALL_CHAINS_NETWORK_ID } from "./constants";
-import { Chain, ByteLength } from "./types";
+import { ALL_CHAINS_NETWORK_ID, RAILGUN_ASCII } from "./constants";
+import { Chain } from "./types";
 
 /**
  * The function `getChainFullNetworkID` formats a chain's type and ID into a full network ID string.
@@ -16,18 +8,18 @@ import { Chain, ByteLength } from "./types";
  * @returns The function `getChainFullNetworkID` returns a string that concatenates the formatted chain
  * type and chain ID of the input `chain` object.
  */
-const getChainFullNetworkID = (chain: Chain): string => {
-  // 1 byte: chainType.
-  const formattedChainType = formatToByteLength(
-    hexlify(chain.type),
-    ByteLength.UINT_8
-  );
+const getChainFullNetworkID = ({ type, id }: Chain): Uint8Array => {
+  const networkBuf = new Uint8Array(8);
+  const dataView = new DataView(networkBuf.buffer);
+
   // 7 bytes: chainID.
-  const formattedChainID = formatToByteLength(
-    hexlify(chain.id),
-    ByteLength.UINT_56
-  );
-  return `${formattedChainType}${formattedChainID}`;
+  // Set the chain ID as a 7-byte number (56 bits) starting from the 1st byte.
+  dataView.setBigUint64(0, BigInt(id), false); // false for big-endian
+
+  // // 1 byte: chainType.
+  networkBuf[0] = type;
+
+  return networkBuf;
 };
 
 /**
@@ -38,15 +30,26 @@ const getChainFullNetworkID = (chain: Chain): string => {
  * `Chain` object with `type` and `id` properties based on the provided `networkID` and returns that
  * `Chain` object.
  */
-export const networkIDToChain = (networkID: string): Optional<Chain> => {
-  if (networkID === ALL_CHAINS_NETWORK_ID) {
+export const networkIDToChain = (networkID: Uint8Array): Optional<Chain> => {
+  // We xor the networkID with the RAILGUN_ASCII to decode the chain type and ID.
+  const xorNetwork = xorRailgun(networkID);
+  let matches = true;
+  for (let i = 0; i < xorNetwork.length; i++) {
+    if (xorNetwork[i] !== ALL_CHAINS_NETWORK_ID[i]) {
+      matches = false;
+    }
+  }
+  if (matches) {
     return undefined;
   }
 
-  const chain: Chain = {
-    type: parseInt(networkID.slice(0, 2), 16),
-    id: parseInt(networkID.slice(2, 16), 16),
-  };
+  const type = xorNetwork[0]!;
+
+  // Extract the last 7 bytes of the 8-byte value by applying a bitmask.
+  // The bitmask 0x00ffffffffffff ensures that the most significant byte is cleared (set to 0),
+  // leaving only the lower 56 bits (7 bytes) of the value.
+  const id = Number(xorNetwork.slice(1).join("")) & 0x00ffffffffffff;
+  const chain: Chain = { type, id };
   return chain;
 };
 
@@ -58,7 +61,7 @@ export const networkIDToChain = (networkID: string): Optional<Chain> => {
  * @returns The function `chainToNetworkID` returns the network ID associated with the input `chain`.
  * If the `chain` is `null`, it returns the network ID for all chains.
  */
-export const chainToNetworkID = (chain: Optional<Chain>): string => {
+export const chainToNetworkID = (chain: Optional<Chain>): Uint8Array => {
   if (chain == null) {
     return ALL_CHAINS_NETWORK_ID;
   }
@@ -68,13 +71,17 @@ export const chainToNetworkID = (chain: Optional<Chain>): string => {
 };
 
 /**
- * @param chainID - hex value of chainID
- * @returns - chainID XOR'd with 'railgun' to make address prettier
+ * XORs each byte of the given chainID with the corresponding byte in the RAILGUN_ASCII array.
+ *
+ * @param chainID - A Uint8Array representing the chain ID to be XORed.
+ * @returns A new Uint8Array of length 8 containing the XOR result.
  */
-export const xorNetworkID = (chainID: string) => {
-  const chainIDBuffer = hexStringToUint8Array(chainID);
-  const railgunBuffer = utf8StringToUint8Array("railgun");
-  const xorOutput = xor(chainIDBuffer, railgunBuffer);
+export const xorRailgun = (chainID: Uint8Array) => {
+  const xorOutput = new Uint8Array(8);
 
-  return uint8ArrayToHex(xorOutput);
+  for (let i = 0; i < chainID.length; i++) {
+    xorOutput[i] = chainID[i]! ^ RAILGUN_ASCII[i]!;
+  }
+
+  return xorOutput;
 };
