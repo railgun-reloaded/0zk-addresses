@@ -1,24 +1,22 @@
-export enum ChainType {
+enum ChainType {
   EVM = 0,
 }
 
-export type Chain = {
+type Chain = {
   id: number;
   type: ChainType;
 };
 
-export type RailgunAddressLike = `0zk1${string}`;
+type RailgunAddressLike = `0zk1${string}`;
 
-export type AddressData = {
+type AddressData = {
   masterPublicKey: Uint8Array;
   viewingPublicKey: Uint8Array;
   chain?: Optional<Chain>;
   version?: Optional<number>;
 };
 
-export type BytesData = bigint | number | ArrayLike<number> | string;
-
-export enum ByteLength {
+enum ByteLength {
   UINT_8 = 1,
   UINT_56 = 7,
   UINT_120 = 15,
@@ -28,3 +26,11 @@ export enum ByteLength {
   UINT_248 = 31,
   UINT_256 = 32,
 }
+
+export {
+  ByteLength,
+  ChainType,
+  type Chain,
+  type AddressData,
+  type RailgunAddressLike,
+};
