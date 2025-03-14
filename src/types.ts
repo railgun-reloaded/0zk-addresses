@@ -10,17 +10,13 @@ export type Chain = {
 export type RailgunAddressLike = `0zk1${string}`;
 
 export type AddressData = {
-  masterPublicKey: bigint;
+  masterPublicKey: Uint8Array;
   viewingPublicKey: Uint8Array;
   chain?: Optional<Chain>;
   version?: Optional<number>;
 };
 
 export type BytesData = bigint | number | ArrayLike<number> | string;
-
-export const isDefined = <T>(a: T | undefined | null): a is T => {
-  return typeof a !== "undefined" && a !== null;
-};
 
 export enum ByteLength {
   UINT_8 = 1,

@@ -1,13 +1,5 @@
-import {
-  formatToByteLength,
-  hexlify,
-  hexStringToUint8Array,
-  uint8ArrayToHex,
-  utf8StringToUint8Array,
-  xor,
-} from "./bytes";
-import { ALL_CHAINS_NETWORK_ID } from "./constants";
-import { Chain, ByteLength } from "./types";
+import { ALL_CHAINS_NETWORK_ID, RAILGUN_ASCII } from "./constants";
+import { Chain } from "./types";
 
 /**
  * The function `getChainFullNetworkID` formats a chain's type and ID into a full network ID string.
@@ -16,18 +8,18 @@ import { Chain, ByteLength } from "./types";
  * @returns The function `getChainFullNetworkID` returns a string that concatenates the formatted chain
  * type and chain ID of the input `chain` object.
  */
-const getChainFullNetworkID = (chain: Chain): string => {
-  // 1 byte: chainType.
-  const formattedChainType = formatToByteLength(
-    hexlify(chain.type),
-    ByteLength.UINT_8
-  );
+const getChainFullNetworkID = ({ type, id }: Chain): Uint8Array => {
+  const networkBuf = new Uint8Array(8);
+  const dataView = new DataView(networkBuf.buffer);
+
   // 7 bytes: chainID.
-  const formattedChainID = formatToByteLength(
-    hexlify(chain.id),
-    ByteLength.UINT_56
-  );
-  return `${formattedChainType}${formattedChainID}`;
+  // Set the chain ID as a 7-byte number (56 bits) starting from the 1st byte.
+  dataView.setBigUint64(0, BigInt(id), false); // false for big-endian
+
+  // 1 byte: chainType.
+  networkBuf[0] = type;
+
+  return networkBuf;
 };
 
 /**
@@ -38,15 +30,19 @@ const getChainFullNetworkID = (chain: Chain): string => {
  * `Chain` object with `type` and `id` properties based on the provided `networkID` and returns that
  * `Chain` object.
  */
-export const networkIDToChain = (networkID: string): Optional<Chain> => {
+export const networkIDToChain = (networkID: Uint8Array): Optional<Chain> => {
   if (networkID === ALL_CHAINS_NETWORK_ID) {
     return undefined;
   }
 
-  const chain: Chain = {
-    type: parseInt(networkID.slice(0, 2), 16),
-    id: parseInt(networkID.slice(2, 16), 16),
-  };
+  // We xor the networkID with the RAILGUN_ASCII to decode the chain type and ID.
+  const xorNetwork = xorRailgun(networkID);
+
+  const dataView = new DataView(xorNetwork.buffer);
+  const type = xorNetwork[0]!;
+  const id = Number(dataView.getBigUint64(1, false));
+  const chain: Chain = { type, id };
+
   return chain;
 };
 
@@ -58,23 +54,22 @@ export const networkIDToChain = (networkID: string): Optional<Chain> => {
  * @returns The function `chainToNetworkID` returns the network ID associated with the input `chain`.
  * If the `chain` is `null`, it returns the network ID for all chains.
  */
-export const chainToNetworkID = (chain: Optional<Chain>): string => {
+export const chainToNetworkID = (chain: Optional<Chain>): Uint8Array => {
   if (chain == null) {
-    return ALL_CHAINS_NETWORK_ID;
+    return ALL_CHAINS_NETWORK_ID.slice();
   }
 
   const networkID = getChainFullNetworkID(chain);
   return networkID;
 };
 
-/**
- * @param chainID - hex value of chainID
- * @returns - chainID XOR'd with 'railgun' to make address prettier
- */
-export const xorNetworkID = (chainID: string) => {
-  const chainIDBuffer = hexStringToUint8Array(chainID);
-  const railgunBuffer = utf8StringToUint8Array("railgun");
-  const xorOutput = xor(chainIDBuffer, railgunBuffer);
+// TODO: Add documentation
+export const xorRailgun = (chainID: Uint8Array) => {
+  const xorOutput = new Uint8Array(8);
 
-  return uint8ArrayToHex(xorOutput);
+  for (let i = 0; i < chainID.length; i++) {
+    xorOutput[i] = chainID[i]! ^ RAILGUN_ASCII[i]!;
+  }
+
+  return xorOutput;
 };
