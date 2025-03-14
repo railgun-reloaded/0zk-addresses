@@ -141,6 +141,15 @@ export const formatToByteLength = (
   return trimmed;
 };
 
+export const formatUint8ArrayToLength = (
+  data: Uint8Array,
+  length: ByteLength
+): Uint8Array => {
+  const buffer = new Uint8Array(length);
+  buffer.set(data, length - data.length);
+  return buffer;
+};
+
 /**
  * Pads BytesData to specified length
  * @param data - bytes data

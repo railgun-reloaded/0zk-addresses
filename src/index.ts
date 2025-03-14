@@ -1,7 +1,13 @@
 import { bech32m } from "@scure/base";
 import { ADDRESS_LENGTH_LIMIT, ADDRESS_VERSION, PREFIX } from "./constants";
-import { type AddressData, type Chain, type RailgunAddressLike } from "./types";
-import { networkIDToChain, chainToNetworkID } from "./chain";
+import {
+  ByteLength,
+  type AddressData,
+  type Chain,
+  type RailgunAddressLike,
+} from "./types";
+import { networkIDToChain, chainToNetworkID, xorRailgun } from "./chain";
+import { formatUint8ArrayToLength } from "./bytes";
 
 /**
  * @param address - RAILGUN encoded address like string
@@ -13,6 +19,7 @@ const parse = (address: RailgunAddressLike): AddressData => {
   }
 
   try {
+    console.log("DECODING ADDRESS", address);
     const decoded = bech32m.decode(address, ADDRESS_LENGTH_LIMIT);
 
     if (decoded.prefix !== PREFIX) {
@@ -70,10 +77,47 @@ const stringify = ({
   const addressBuffer = new Uint8Array(73);
   const networkID = chainToNetworkID(chain);
 
+  // masterPublicKey & viewingPublicKey need to be ByteLength.UINT256
+
+  // const masterPublicKeyPadded = formatToByteLength(
+  //   masterPublicKey,
+  //   ByteLength.UINT_256
+  // );
+
+  const masterPublicKeyBuffer = formatUint8ArrayToLength(
+    masterPublicKey,
+    ByteLength.UINT_256
+  );
+
+  // masterPublicKeyBuffer.set(
+  //   masterPublicKey,
+  //   ByteLength.UINT_256 - masterPublicKey.length
+  // );
+
+  // console.log(masterPublicKey, masterPublicKeyPadded, masterPublicKeyBuffer);
+
+  // const viewingPublicKeyPadded = formatToByteLength(
+  //   viewingPublicKey,
+  //   ByteLength.UINT_256
+  // );
+  const viewingPublicKeyBuffer = formatUint8ArrayToLength(
+    viewingPublicKey,
+    ByteLength.UINT_256
+  );
+
+  // console.log(viewingPublicKey, viewingPublicKeyPadded, viewingPublicKeyBuffer);
+
+  const networkIDXor = xorRailgun(networkID);
+
+  // console.log(networkIDXor);
+
+  // console.log("NETWORKID", networkID);
   addressBuffer[0] = 0x01; // Version "01"
-  addressBuffer.set(masterPublicKey, 1);
-  addressBuffer.set(networkID, 33);
-  addressBuffer.set(viewingPublicKey, 41);
+  addressBuffer.set(masterPublicKeyBuffer, 1);
+  addressBuffer.set(networkIDXor, 33);
+  addressBuffer.set(viewingPublicKeyBuffer, 41);
+
+  console.log("addressBuffer", addressBuffer);
 
   // Encode address
   const address = bech32m.encode(

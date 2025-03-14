@@ -1,5 +1,7 @@
+// import { formatUint8ArrayToLength } from "./bytes";
+import { formatUint8ArrayToLength } from "./bytes";
 import { ALL_CHAINS_NETWORK_ID, RAILGUN_ASCII } from "./constants";
-import { Chain } from "./types";
+import { ByteLength, Chain } from "./types";
 
 /**
  * The function `getChainFullNetworkID` formats a chain's type and ID into a full network ID string.
@@ -10,14 +12,26 @@ import { Chain } from "./types";
  */
 const getChainFullNetworkID = ({ type, id }: Chain): Uint8Array => {
   const networkBuf = new Uint8Array(8);
-  const dataView = new DataView(networkBuf.buffer);
+  // const dataView = new DataView(networkBuf.buffer);
+
+  const typeArray = new Uint8Array(1);
+  const idArray = new Uint8Array(1);
+  typeArray[0] = type;
+  idArray[0] = id;
+  const typeBuffer = formatUint8ArrayToLength(typeArray, ByteLength.UINT_8);
+  const idBuffer = formatUint8ArrayToLength(idArray, ByteLength.UINT_56);
+
+  networkBuf.set(typeBuffer);
+  networkBuf.set(idBuffer, ByteLength.UINT_8);
+
+  // console.log("NETWORKIDb", networkBuf);
 
   // 7 bytes: chainID.
   // Set the chain ID as a 7-byte number (56 bits) starting from the 1st byte.
-  dataView.setBigUint64(0, BigInt(id), false); // false for big-endian
+  // dataView.setBigUint64(0, BigInt(id), false); // false for big-endian
 
-  // 1 byte: chainType.
-  networkBuf[0] = type;
+  // // 1 byte: chainType.
+  // networkBuf[0] = type;
 
   return networkBuf;
 };
@@ -37,12 +51,15 @@ export const networkIDToChain = (networkID: Uint8Array): Optional<Chain> => {
 
   // We xor the networkID with the RAILGUN_ASCII to decode the chain type and ID.
   const xorNetwork = xorRailgun(networkID);
-
   const dataView = new DataView(xorNetwork.buffer);
   const type = xorNetwork[0]!;
-  const id = Number(dataView.getBigUint64(1, false));
-  const chain: Chain = { type, id };
 
+  // Extract the last 7 bytes of the 8-byte value by applying a bitmask.
+  // The bitmask 0x00ffffffffffffff ensures that the most significant byte is cleared (set to 0),
+  // leaving only the lower 56 bits (7 bytes) of the value.
+  const id = Number(dataView.getBigUint64(0, false)) & 0x00ffffffffffffff;
+
+  const chain: Chain = { type, id };
   return chain;
 };
 
@@ -56,7 +73,7 @@ export const networkIDToChain = (networkID: Uint8Array): Optional<Chain> => {
  */
 export const chainToNetworkID = (chain: Optional<Chain>): Uint8Array => {
   if (chain == null) {
-    return ALL_CHAINS_NETWORK_ID.slice();
+    return ALL_CHAINS_NETWORK_ID; //.slice();
   }
 
   const networkID = getChainFullNetworkID(chain);
