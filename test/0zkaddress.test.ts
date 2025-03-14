@@ -49,7 +49,9 @@ describe("bech32-encode2", () => {
     ];
     for (const [_, { pubkey, chain, version, address }] of vectors.entries()) {
       const addressData: AddressData = {
-        masterPublicKey: hexStringToBytes(pubkey), // Uint8Array
+        masterPublicKey: hexStringToBytes(
+          formatToByteLength(pubkey, ByteLength.UINT_256, false)
+        ), // Uint8Array
         viewingPublicKey: hexStringToBytes(
           formatToByteLength(pubkey, ByteLength.UINT_256, false)
         ), // Uint8Array
@@ -63,8 +65,6 @@ describe("bech32-encode2", () => {
       expect(encodedAddress.length).toBe(ADDRESS_LENGTH_LIMIT);
 
       const parsed = parse(encodedAddress);
-      console.log("PARSED,", parsed);
-      // console.log("encodedAddress", encodedAddress);
       expect(parsed).toMatchObject(addressData);
     }
   });
