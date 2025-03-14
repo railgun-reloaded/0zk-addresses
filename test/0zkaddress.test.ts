@@ -65,7 +65,7 @@ describe("bech32-encode2", () => {
       const parsed = parse(encodedAddress);
       console.log("PARSED,", parsed);
       // console.log("encodedAddress", encodedAddress);
-      // expect(parse(encodedAddress)).toMatchObject(addressData);
+      expect(parsed).toMatchObject(addressData);
     }
   });
 
