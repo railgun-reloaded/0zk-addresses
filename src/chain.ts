@@ -47,9 +47,9 @@ export const networkIDToChain = (networkID: Uint8Array): Optional<Chain> => {
   const type = xorNetwork[0]!;
 
   // Extract the last 7 bytes of the 8-byte value by applying a bitmask.
-  // The bitmask 0x00ffffffffffffff ensures that the most significant byte is cleared (set to 0),
+  // The bitmask 0x00ffffffffffff ensures that the most significant byte is cleared (set to 0),
   // leaving only the lower 56 bits (7 bytes) of the value.
-  const id = Number(xorNetwork.slice(1, 8).join(""));
+  const id = Number(xorNetwork.slice(1).join("")) & 0x00ffffffffffff;
   const chain: Chain = { type, id };
   return chain;
 };
