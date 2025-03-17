@@ -88,4 +88,20 @@ describe("bech32-encode2", () => {
       );
     }).toThrowError("Failed to decode bech32 address");
   });
+
+  it("Should throw error on invalid masterPublicKey length", () => {
+    const pubKey = new Uint8Array([
+      0, 0, 1, 191, 213, 104, 28, 4, 121, 190, 154, 142, 248, 221, 139, 170,
+    ]);
+    const addressData: AddressData = {
+      masterPublicKey: pubKey,
+      viewingPublicKey: pubKey,
+      chain: { type: ChainType.EVM, id: 1 },
+      version: 1,
+    };
+
+    expect(() => {
+      stringify(addressData);
+    }).toThrowError("Invalid masterPublicKey length, expected 32 bytes");
+  });
 });

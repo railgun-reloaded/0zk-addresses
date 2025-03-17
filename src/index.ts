@@ -72,6 +72,10 @@ const stringify = ({
   chain,
   viewingPublicKey,
 }: AddressData): RailgunAddressLike => {
+  if (masterPublicKey.byteLength !== 32) {
+    throw new Error("Invalid masterPublicKey length, expected 32 bytes");
+  }
+
   // Create 73 byte address buffer (version || masterPublicKey || networkID || viewingPublicKey)
   const addressBuffer = new Uint8Array(73);
   const networkID = chainToNetworkID(chain);
