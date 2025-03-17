@@ -7,7 +7,7 @@ type TestVector = {
   address: `0zk1${string}`;
 };
 
-const TEST_VECTORS: TestVector[] = [
+const TEST_VECTORS_V2: TestVector[] = [
   {
     pubkey: new Uint8Array([
       0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -60,4 +60,4 @@ const TEST_VECTORS: TestVector[] = [
   },
 ];
 
-export { TEST_VECTORS };
+export { TEST_VECTORS_V2 };

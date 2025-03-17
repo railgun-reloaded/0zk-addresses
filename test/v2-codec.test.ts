@@ -1,30 +1,29 @@
 import { describe, it } from "node:test";
-import { type AddressData, type RailgunAddressLike } from "../src/types";
+
 import expect from "expect";
 
-import { parse, stringify } from "../src/V2/codec";
+import { RailgunAddressV2 } from "../src/V2";
+import { type AddressData } from "../src/types";
+import { TEST_VECTORS_V2 } from "./vectors";
 import { ADDRESS_LENGTH_LIMIT } from "../src/constants";
-import { TEST_VECTORS } from "./vectors";
 
-describe("bech32-encode2", () => {
-  it("Should encode and decode addresses", () => {
+describe("RailgunAddress-V2 Codecs", () => {
+  it("Should properly parse and stringify a RAILGUN-V2 Address", () => {
     for (const [
       _,
       { pubkey, chain, version, address },
-    ] of TEST_VECTORS.entries()) {
-      const addressData: AddressData = {
+    ] of TEST_VECTORS_V2.entries()) {
+      const expectedResult: AddressData = {
         masterPublicKey: pubkey,
         viewingPublicKey: pubkey,
         chain,
         version,
       };
-
-      const encodedAddress: RailgunAddressLike = stringify(addressData);
-
-      const parsed = parse(encodedAddress);
-      expect(encodedAddress).toBe(address);
-      expect(encodedAddress.length).toBe(ADDRESS_LENGTH_LIMIT);
-      expect(parsed).toMatchObject(addressData);
+      const stringifiedAddress = RailgunAddressV2.stringify(expectedResult);
+      const parsed = RailgunAddressV2.parse(stringifiedAddress);
+      expect(stringifiedAddress).toBe(address);
+      expect(stringifiedAddress.length).toBe(ADDRESS_LENGTH_LIMIT);
+      expect(parsed).toMatchObject(expectedResult);
     }
   });
 
@@ -40,13 +39,13 @@ describe("bech32-encode2", () => {
         version: undefined,
       };
 
-      stringify(badKeyLengthData);
+      RailgunAddressV2.stringify(badKeyLengthData);
     }).toThrowError("Invalid byte length for input.");
   });
 
   it("Should throw error on invalid address checksum", () => {
     expect(() => {
-      parse(
+      RailgunAddressV2.parse(
         "0zk1pnj7u66vwqhcquxgmh4pewutpa4y55vtwlag60umdpshkej92rn47ey76ges3t3enn"
       );
     }).toThrowError("Invalid checksum");
@@ -54,7 +53,7 @@ describe("bech32-encode2", () => {
 
   it("Should throw error on invalid address prefix", () => {
     expect(() => {
-      parse(
+      RailgunAddressV2.parse(
         "0zk1rgqyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqunpd9kxwatwqyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqsfhuuw"
       );
     }).toThrowError("Failed to decode bech32 address");
