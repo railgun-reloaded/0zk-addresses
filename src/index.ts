@@ -9,6 +9,7 @@ import {
 } from "./constants";
 
 /**
+ * The `parse` function decodes the encoded RAILGUN address using Bech32 and returns the decoded data.
  * @param address - The `address` parameter is of type `RailgunAddressLike` and its the encoded RAILGUN  address.
  * @returns {AddressData} - Returns `addressData` object with the data decoded.
  */
@@ -63,7 +64,7 @@ const parse = (address: RailgunAddressLike): AddressData => {
 };
 
 /**
- * Bech32 encodes address
+ * The `stringify` function encodes the address data using Bech32 and returns the encoded address.
  * @param addressData - The `addressData` parameter is of type `AddressData` and its the data to be encoded.
  * @returns {RailgunAddressLike} - Returns a string that represents the encoded address.
  */
