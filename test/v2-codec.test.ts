@@ -26,7 +26,7 @@ describe("RailgunAddress-V2 Codecs", () => {
     }
   });
 
-  it("Should throw error on invalid input length", () => {
+  it("Should throw error on invalid masterPublicKey length", () => {
     assert.throws(() => {
       const badKeyLengthData: AddressData = {
         masterPublicKey: new Uint8Array([0, 0, 0, 0]),
@@ -39,7 +39,22 @@ describe("RailgunAddress-V2 Codecs", () => {
       };
 
       RailgunAddressV2.stringify(badKeyLengthData);
-    }, /Invalid byte length for input./);
+    }, /Error: Invalid masterPublicKey length, expected 32 bytes/);
+  });
+  it("Should throw error on invalid viewingPublicKey length", () => {
+    assert.throws(() => {
+      const badKeyLengthData: AddressData = {
+        masterPublicKey: new Uint8Array([
+          0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+          0, 0, 0, 0, 0, 0, 0, 0, 0,
+        ]),
+        viewingPublicKey: new Uint8Array([0, 0, 0, 0]),
+        chain: undefined,
+        version: undefined,
+      };
+
+      RailgunAddressV2.stringify(badKeyLengthData);
+    }, /Error: Invalid viewingPublicKey length, expected 32 bytes/);
   });
 
   it("Should throw error on invalid address checksum", () => {
