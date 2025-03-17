@@ -40,12 +40,13 @@ export const networkIDToChain = (networkID: Uint8Array): Chain => {
 
   /**
    * The chain type is determined by the most significant byte (shifted right by 56 bits),
-   * and the chain ID is extracted from the first byte using a bitwise AND operation.
+   * and the chain ID is extracted from the remaining 56 bits using a bitwise AND operation.
    */
-  const type = Number(bigIntDataNetwork >> 56n);
-  const id = Number(bigIntDataNetwork & 0x00ff_ffff_ffff_ffffn);
+  const chain: Chain = {
+    type: Number(bigIntDataNetwork >> 56n),
+    id: Number(bigIntDataNetwork & 0x00ff_ffff_ffff_ffffn),
+  };
 
-  const chain: Chain = { type, id };
   return chain;
 };
 
