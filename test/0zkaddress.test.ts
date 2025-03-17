@@ -2,7 +2,7 @@ import { describe, it } from "node:test";
 import { type AddressData, type RailgunAddressLike } from "../src/types";
 import expect from "expect";
 
-import { parse, stringify } from "../src/V2/actions";
+import { parse, stringify } from "../src/V2/codec";
 import { ADDRESS_LENGTH_LIMIT } from "../src/constants";
 import { TEST_VECTORS } from "./vectors";
 

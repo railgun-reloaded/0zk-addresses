@@ -1,4 +1,4 @@
-import { parse, stringify } from "./actions";
+import { parse, stringify } from "./codec";
 
 class RailgunAddressV2 {
   static parse = parse;
