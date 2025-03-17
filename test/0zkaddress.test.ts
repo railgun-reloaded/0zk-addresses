@@ -66,11 +66,27 @@ describe("bech32-encode2", () => {
 
       const encodedAddress: RailgunAddressLike = stringify(addressData);
 
+      const parsed = parse(encodedAddress);
       expect(encodedAddress).toBe(address);
       expect(encodedAddress.length).toBe(ADDRESS_LENGTH_LIMIT);
-      const parsed = parse(encodedAddress);
       expect(parsed).toMatchObject(addressData);
     }
+  });
+
+  it("Should throw error on invalid input length", () => {
+    expect(() => {
+      const badKeyLengthData: AddressData = {
+        masterPublicKey: new Uint8Array([0, 0, 0, 0]),
+        viewingPublicKey: new Uint8Array([
+          0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+          0, 0, 0, 0, 0, 0, 0, 0, 0,
+        ]),
+        chain: undefined,
+        version: undefined,
+      };
+
+      stringify(badKeyLengthData);
+    }).toThrowError("Invalid byte length for input.");
   });
 
   it("Should throw error on invalid address checksum", () => {

@@ -62,10 +62,14 @@ const parse = (address: RailgunAddressLike): AddressData => {
  * @param addressData - AddressData to encode
  */
 const stringify = ({
-  masterPublicKey,
+  masterPublicKey, // incoming data must be padded properly
   chain,
-  viewingPublicKey,
+  viewingPublicKey, // incoming data must be padded properly
 }: AddressData): RailgunAddressLike => {
+
+  if(masterPublicKey.length != 32 || viewingPublicKey.length != 32){
+    throw new Error("Invalid byte length for input.");
+  }
   // Create 73 byte address buffer (version || masterPublicKey || networkID || viewingPublicKey)
   const addressBuffer = new Uint8Array(73);
   const networkID = chainToNetworkID(chain);
