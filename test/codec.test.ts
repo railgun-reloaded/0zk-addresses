@@ -89,13 +89,39 @@ describe("Railgun Addresses Encoding & Decoding", () => {
     }, /Failed to decode bech32 address/);
   });
 
-  it("Should throw error on invalid masterPublicKey length", () => {
-    const pubKey = new Uint8Array([
+  it("Should throw error on invalid viewingPublicKey length", () => {
+    const viewingPublicKey = new Uint8Array([
       0, 0, 1, 191, 213, 104, 28, 4, 121, 190, 154, 142, 248, 221, 139, 170,
     ]);
+    const masterPublicKey = new Uint8Array([
+      0, 0, 1, 191, 213, 104, 28, 4, 121, 190, 154, 142, 248, 221, 139, 170,
+      221, 151, 17, 88, 153, 169, 175, 48, 179, 210, 69, 88, 67, 175, 180, 27,
+    ]);
+
     const addressData: AddressData = {
-      masterPublicKey: pubKey,
-      viewingPublicKey: pubKey,
+      masterPublicKey,
+      viewingPublicKey,
+      chain: { type: ChainType.EVM, id: 1 },
+      version: 1,
+    };
+
+    assert.throws(() => {
+      stringify(addressData);
+    }, /Invalid viewingPublicKey length, expected 32 bytes/);
+  });
+
+  it("Should throw error on invalid masterPublicKey length", () => {
+    const masterPublicKey = new Uint8Array([
+      0, 0, 1, 191, 213, 104, 28, 4, 121, 190, 154, 142, 248, 221, 139, 170,
+    ]);
+    const viewingPublicKey = new Uint8Array([
+      0, 0, 1, 191, 213, 104, 28, 4, 121, 190, 154, 142, 248, 221, 139, 170,
+      221, 151, 17, 88, 153, 169, 175, 48, 179, 210, 69, 88, 67, 175, 180, 27,
+    ]);
+
+    const addressData: AddressData = {
+      masterPublicKey,
+      viewingPublicKey,
       chain: { type: ChainType.EVM, id: 1 },
       version: 1,
     };
