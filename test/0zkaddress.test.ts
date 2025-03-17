@@ -51,7 +51,7 @@ const testVectors = [
   },
 ];
 
-describe("bech32-encode2", () => {
+describe("Railgun Addresses Encoding & Decoding", () => {
   it("Should encode and decode addresses", () => {
     for (const [_, vector] of testVectors.entries()) {
       const { pubkey, chain, address, version } = vector;
