@@ -38,7 +38,7 @@ const parse = (address: RailgunAddressLike): AddressData => {
     const chain: Optional<Chain> = networkIDToChain(networkID);
 
     // Throw if address version is not supported
-    if (version !== ADDRESS_VERSION)
+    if (version !== ADDRESS_VERSION.V2)
       throw new Error("Incorrect address version");
 
     const result: AddressData = {
@@ -80,7 +80,7 @@ const stringify = ({
 
   const networkIDXor = xorRailgun(networkID);
 
-  addressBuffer[0] = ADDRESS_VERSION; // Version "01"
+  addressBuffer[0] = ADDRESS_VERSION.V2; // Version "01"
 
   addressBuffer.set(masterPublicKey, 1);
   addressBuffer.set(networkIDXor, 33);

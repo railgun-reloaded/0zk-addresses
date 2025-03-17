@@ -1,4 +1,8 @@
-const ADDRESS_VERSION = 0x01;
+// const ADDRESS_VERSION = 0x01;
+enum ADDRESS_VERSION {
+  V2 = 0x01,
+  V3 = 0x02,
+}
 const ADDRESS_LENGTH_LIMIT = 127;
 const ALL_CHAINS_NETWORK_ID = new Uint8Array(8).fill(0xff);
 const PREFIX = "0zk";
