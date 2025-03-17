@@ -4,7 +4,8 @@
   "description": "A simple module for encoding and decoding railgun formatted addresses",
   "main": "src/index.js",
   "scripts": {
-    "build": "tsc",
+    "build": "tsc --build",
+    "clean": "tsc --build --clean",
     "test": "npm run build && node --test ./test/*.test.js"
   },
   "author": "RAILGUN Project Contributors",
