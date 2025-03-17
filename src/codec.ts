@@ -10,7 +10,7 @@ import {
 
 /**
  * The `parse` function decodes the encoded RAILGUN address using Bech32 and returns the decoded data.
- * @param address - The `address` parameter is of type `RailgunAddressLike` and its the encoded RAILGUN  address.
+ * @param address - The `address` parameter is of type `RailgunAddressLike` and its the encoded RAILGUN address.
  * @returns {AddressData} - Returns `addressData` object with the data decoded.
  */
 const parse = (address: RailgunAddressLike): AddressData => {
@@ -84,7 +84,7 @@ const stringify = ({
 
   addressBuffer[0] = CURRENT_ADDRESS_VERSION; // Version "01" 1 byte
   addressBuffer.set(masterPublicKey, 1); // 32 bytes
-  addressBuffer.set(networkIDXor, 33); // 8 bytes
+  addressBuffer.set(networkIDXor, 33); // 8 bytes (id: 7 bytes | type: 1 byte)
   addressBuffer.set(viewingPublicKey, 41); // 32 bytes
 
   // Encode address
