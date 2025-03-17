@@ -2,7 +2,7 @@
   "name": "@railgun-reloaded/0zk-addresses",
   "version": "1.0.0",
   "description": "A simple module for encoding and decoding railgun formatted addresses",
-  "main": "build/index.js",
+  "main": "src/index.js",
   "scripts": {
     "build": "tsc",
     "test": "npm run build && node --test ./test/*.test.js"
