@@ -1,10 +1,10 @@
 import { describe, it } from "node:test";
+import assert from "node:assert/strict";
 import {
   ChainType,
   type AddressData,
   type RailgunAddressLike,
 } from "../src/types";
-import expect from "expect";
 import { parse, stringify } from "../src";
 import { ADDRESS_LENGTH_LIMIT } from "../src/constants";
 
@@ -65,28 +65,28 @@ describe("bech32-encode2", () => {
 
       // Encode address using stringify()
       const encodedAddress: RailgunAddressLike = stringify(addressData);
-      expect(encodedAddress).toBe(address);
-      expect(encodedAddress.length).toBe(ADDRESS_LENGTH_LIMIT);
+      assert.strictEqual(encodedAddress, address);
+      assert.strictEqual(encodedAddress.length, ADDRESS_LENGTH_LIMIT);
 
       // Decode address using parse()
-      expect(parse(address)).toMatchObject(addressData);
+      assert.deepStrictEqual(parse(address), addressData);
     }
   });
 
   it("Should throw error on invalid address checksum", () => {
-    expect(() => {
+    assert.throws(() => {
       parse(
         "0zk1pnj7u66vwqhcquxgmh4pewutpa4y55vtwlag60umdpshkej92rn47ey76ges3t3enn"
       );
-    }).toThrowError("Invalid checksum");
+    }, /Invalid checksum/);
   });
 
   it("Should throw error on invalid address prefix", () => {
-    expect(() => {
+    assert.throws(() => {
       parse(
         "0zk1rgqyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqunpd9kxwatwqyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqsfhuuw"
       );
-    }).toThrowError("Failed to decode bech32 address");
+    }, /Failed to decode bech32 address/);
   });
 
   it("Should throw error on invalid masterPublicKey length", () => {
@@ -100,8 +100,8 @@ describe("bech32-encode2", () => {
       version: 1,
     };
 
-    expect(() => {
+    assert.throws(() => {
       stringify(addressData);
-    }).toThrowError("Invalid masterPublicKey length, expected 32 bytes");
+    }, /Invalid masterPublicKey length, expected 32 bytes/);
   });
 });
