@@ -69,7 +69,7 @@ function main() {
         ],
         chain: { type: ChainType.ALL, id: CHAIN_ID_ANY },
         version: 1
-      }
+  };
   const stringifiedAddress = stringify(railgunAddressData);
 
   console.log("stringifiedAddress", stringifiedAddress);
