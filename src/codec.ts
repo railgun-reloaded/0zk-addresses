@@ -41,8 +41,9 @@ export function parse(address: string): AddressData {
  */
 export function stringify({
   masterPublicKey,
-  chain = { type: ChainType.ANY, id: CHAIN_ID_ANY },
   viewingPublicKey,
+  chain = { type: ChainType.ANY, id: CHAIN_ID_ANY },
+  version = CURRENT_ADDRESS_VERSION,
 }: AddressData): RailgunAddressLike {
   if (masterPublicKey.length != 32) {
     throw new Error("Invalid masterPublicKey length, expected 32 bytes");
@@ -56,7 +57,7 @@ export function stringify({
   const networkID = chainToNetworkID(chain);
   const networkIDXor = xorRailgun(networkID);
 
-  addressBuffer[0] = CURRENT_ADDRESS_VERSION; // Version "01" 1 byte
+  addressBuffer[0] = version; // Version "01" 1 byte
   addressBuffer.set(masterPublicKey, 1); // 32 bytes
   addressBuffer.set(networkIDXor, 33); // 8 bytes (id: 7 bytes | type: 1 byte)
   addressBuffer.set(viewingPublicKey, 41); // 32 bytes
