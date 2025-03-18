@@ -19,7 +19,7 @@ const originalDecodedAddress: AddressData = {
     81, 139, 119, 250, 141, 63, 155, 104, 97, 123, 102, 69, 80, 231, 95, 100,
   ]),
   version: 1,
-  chain: { type: ChainType.EVM, id: 56 },
+  chain: { type: ChainType.EVM, id: BigInt(56) },
 };
 const stringifiedAddress: RailgunAddressLike = stringify(
   originalDecodedAddress

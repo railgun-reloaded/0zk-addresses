@@ -1,11 +1,12 @@
 import assert from "node:assert/strict";
-import { ALL_CHAINS_NETWORK_ID, RAILGUN_ASCII } from "./constants";
 import {
-  Chain,
-  CHAIN_ID_MASK,
   RAILGUN_ADDRESS_PREFIX,
+  ALL_CHAINS_NETWORK_ID,
   RailgunAddressLike,
-} from "./types";
+  CHAIN_ID_MASK,
+  RAILGUN_ASCII,
+  Chain,
+} from "./definitions";
 
 /**
  * The `xorRailgun` function takes a 8 byte Uint8Array called `networkID` and performs XOR operation with a predefined

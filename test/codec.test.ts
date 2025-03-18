@@ -1,13 +1,13 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
-import {
-  CHAIN_ID_ANY,
-  ChainType,
-  type AddressData,
-  type RailgunAddressLike,
-} from "../src/types";
 import { parse, stringify } from "../src";
-import { ADDRESS_LENGTH_LIMIT } from "../src/constants";
+import {
+  ADDRESS_LENGTH_LIMIT,
+  RailgunAddressLike,
+  CHAIN_ID_ANY,
+  AddressData,
+  ChainType,
+} from "../src/definitions";
 
 const testVectors = [
   {

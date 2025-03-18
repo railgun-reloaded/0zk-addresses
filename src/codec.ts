@@ -1,13 +1,14 @@
 import { bech32m } from "@scure/base";
+import { networkIDToChain, chainToNetworkID, xorRailgun, is0zk } from "./chain";
 import {
-  CHAIN_ID_ANY,
-  ChainType,
+  CURRENT_ADDRESS_VERSION,
   RAILGUN_ADDRESS_PREFIX,
+  ADDRESS_LENGTH_LIMIT,
   RailgunAddressLike,
   type AddressData,
-} from "./types";
-import { networkIDToChain, chainToNetworkID, xorRailgun, is0zk } from "./chain";
-import { ADDRESS_LENGTH_LIMIT, CURRENT_ADDRESS_VERSION } from "./constants";
+  CHAIN_ID_ANY,
+  ChainType,
+} from "./definitions";
 
 /**
  * The `parse` function decodes the encoded RAILGUN address using Bech32 and returns the decoded data.
