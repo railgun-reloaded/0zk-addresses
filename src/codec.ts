@@ -1,78 +1,48 @@
 import { bech32m } from "@scure/base";
-import { type AddressData, type Chain, type RailgunAddressLike } from "./types";
-import { networkIDToChain, chainToNetworkID, xorRailgun } from "./chain";
 import {
-  ADDRESS_VERSION,
-  ADDRESS_LENGTH_LIMIT,
+  CHAIN_ID_ANY,
+  ChainType,
   RAILGUN_ADDRESS_PREFIX,
-  CURRENT_ADDRESS_VERSION,
-} from "./constants";
+  RailgunAddressLike,
+  type AddressData,
+} from "./types";
+import { networkIDToChain, chainToNetworkID, xorRailgun, is0zk } from "./chain";
+import { ADDRESS_LENGTH_LIMIT, CURRENT_ADDRESS_VERSION } from "./constants";
 
 /**
  * The `parse` function decodes the encoded RAILGUN address using Bech32 and returns the decoded data.
  * @param address - The `address` parameter is of type `RailgunAddressLike` and its the encoded RAILGUN address.
  * @returns {AddressData} - Returns `addressData` object with the data decoded.
  */
-const parse = (address: RailgunAddressLike): AddressData => {
-  if (!address) {
-    throw new Error("Error: No address input.");
-  }
+export function parse(address: string): AddressData {
+  // Check if the address is a RAILGUN address
+  is0zk(address);
 
-  try {
-    const decoded = bech32m.decode(address, ADDRESS_LENGTH_LIMIT);
+  const decodedData = bech32m.fromWords(
+    bech32m.decode<typeof RAILGUN_ADDRESS_PREFIX>(address, ADDRESS_LENGTH_LIMIT)
+      .words
+  );
 
-    if (decoded.prefix !== RAILGUN_ADDRESS_PREFIX) {
-      throw new Error("Invalid address prefix");
-    }
+  const decodedAddress: AddressData = {
+    version: decodedData[0]!, // 1 byte
+    masterPublicKey: decodedData.subarray(1, 33), // 32 bytes
+    viewingPublicKey: decodedData.subarray(41, 73), // 32 bytes
+    chain: networkIDToChain(decodedData.subarray(33, 41)), // 8 bytes
+  };
 
-    const data = bech32m.fromWords(decoded.words);
-
-    if (data.byteLength !== 73) {
-      throw new Error("Invalid address length");
-    }
-
-    // Create variables for AddressData from the decoded data
-    const version = data[0]!; // 1 byte
-    const masterPublicKey = data.subarray(1, 33); // 32 bytes
-    const networkID = data.subarray(33, 41); // 8 bytes
-    const viewingPublicKey = data.subarray(41, 73); // 32 bytes
-
-    const chain: Optional<Chain> = networkIDToChain(networkID);
-
-    // Throw if address version is not supported
-    if (version !== ADDRESS_VERSION)
-      throw new Error("Incorrect address version");
-
-    const result: AddressData = {
-      masterPublicKey,
-      viewingPublicKey,
-      version,
-      chain,
-    };
-
-    return result;
-  } catch (cause) {
-    if (
-      cause instanceof Error &&
-      cause.message &&
-      cause.message.includes("Invalid checksum")
-    ) {
-      throw new Error("Invalid checksum");
-    }
-    throw new Error("Failed to decode bech32 address", { cause });
-  }
-};
+  return decodedAddress;
+}
 
 /**
  * The `stringify` function encodes the address data using Bech32 and returns the encoded address.
  * @param addressData - The `addressData` parameter is of type `AddressData` and its the data to be encoded.
  * @returns {RailgunAddressLike} - Returns a string that represents the encoded address.
  */
-const stringify = ({
+export function stringify({
   masterPublicKey,
-  chain,
+  chain = { type: ChainType.ANY, id: CHAIN_ID_ANY },
   viewingPublicKey,
-}: AddressData): RailgunAddressLike => {
+}: AddressData): RailgunAddressLike {
   if (masterPublicKey.length != 32) {
     throw new Error("Invalid masterPublicKey length, expected 32 bytes");
   }
@@ -91,13 +61,11 @@ const stringify = ({
   addressBuffer.set(viewingPublicKey, 41); // 32 bytes
 
   // Encode address
-  const address = bech32m.encode(
+  const encodedAddress = bech32m.encode(
     RAILGUN_ADDRESS_PREFIX,
     bech32m.toWords(addressBuffer),
     ADDRESS_LENGTH_LIMIT
   );
 
-  return address;
-};
-
-export { parse, stringify };
+  return encodedAddress;
+}

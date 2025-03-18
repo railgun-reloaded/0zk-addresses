@@ -1,5 +1,29 @@
+import assert from "node:assert/strict";
 import { ALL_CHAINS_NETWORK_ID, RAILGUN_ASCII } from "./constants";
-import { Chain } from "./types";
+import {
+  Chain,
+  CHAIN_ID_MASK,
+  RAILGUN_ADDRESS_PREFIX,
+  RailgunAddressLike,
+} from "./types";
+
+/**
+ * The `xorRailgun` function takes a 8 byte Uint8Array called `networkID` and performs XOR operation with a predefined
+ * RAILGUN_ASCII array to produce an output Uint8Array.
+ * @param {Uint8Array} networkID - Is a `Uint8Array` of 8 bytes that represents the network information containing type and id.
+ * @returns Returns an 8-byte Uint8Array that is the result of
+ * performing a bitwise XOR operation between each byte of the `networkID` Uint8Array and the
+ * corresponding byte of the `RAILGUN_ASCII` array.
+ */
+export function xorRailgun(networkID: Uint8Array) {
+  const xorOutput = new Uint8Array(8);
+
+  for (let i = 0; i < networkID.length; i++) {
+    xorOutput[i] = networkID[i]! ^ RAILGUN_ASCII[i]!;
+  }
+
+  return xorOutput;
+}
 
 /**
  * The function `getChainFullNetworkID` generates a Uint8Array representing the full network ID based
@@ -10,19 +34,19 @@ import { Chain } from "./types";
  * for a given Chain object. The network ID consists 1 byte representing the chain type and
  * 7 bytes representing the chain ID.
  */
-const getChainFullNetworkID = ({ type, id }: Chain): Uint8Array => {
+export function getChainFullNetworkID({ type, id }: Chain): Uint8Array {
   const networkBuf = new Uint8Array(8);
   const dataView = new DataView(networkBuf.buffer);
 
-  // 7 bytes: chainID.
-  // Set the chain ID as a 7-byte number (56 bits) starting from the 1st byte.
-  dataView.setBigUint64(0, BigInt(id), false); // false for big-endian
+  // 7 bytes: chain id.
+  // Set the chain id as a 7-byte number (56 bits) starting from the 1st byte.
+  dataView.setBigUint64(0, id, false); // false for big-endian
 
-  // 1 byte: chainType.
+  // 1 byte: chain type.
   networkBuf[0] = type;
 
   return networkBuf;
-};
+}
 
 /**
  * The function `networkIDToChain` decodes the an encoded networkID.
@@ -32,7 +56,7 @@ const getChainFullNetworkID = ({ type, id }: Chain): Uint8Array => {
  * The `type` is determined by the most significant byte of the decoded network identifier,
  * and the `id` is extracted from the remaining bits using a bitwise AND operation.
  */
-export const networkIDToChain = (networkID: Uint8Array): Chain => {
+export function networkIDToChain(networkID: Uint8Array): Chain {
   // We xor the networkID with the RAILGUN_ASCII to decode the chain type and ID.
   const xorNetwork = xorRailgun(networkID);
   const dataViewNetwork = new DataView(xorNetwork.buffer);
@@ -44,11 +68,11 @@ export const networkIDToChain = (networkID: Uint8Array): Chain => {
    */
   const chain: Chain = {
     type: Number(bigIntDataNetwork >> 56n),
-    id: Number(bigIntDataNetwork & 0x00ff_ffff_ffff_ffffn),
+    id: bigIntDataNetwork & CHAIN_ID_MASK,
   };
 
   return chain;
-};
+}
 
 /**
  * The function `chainToNetworkID` takes a chain parameter and returns the network ID associated with
@@ -56,29 +80,25 @@ export const networkIDToChain = (networkID: Uint8Array): Chain => {
  * @param chain - The `chain` parameter is an optional value that represents network information.
  * @returns Returns a `Uint8Array` value, which is either the encoded networkID of the provided `chain` or a default value `ALL_CHAINS_NETWORK_ID` if the `chain` is `null`.
  */
-export const chainToNetworkID = (chain: Optional<Chain>): Uint8Array => {
+export function chainToNetworkID(chain: Optional<Chain>): Uint8Array {
   if (chain == null) {
     return ALL_CHAINS_NETWORK_ID;
   }
 
   const networkID = getChainFullNetworkID(chain);
   return networkID;
-};
+}
 
 /**
- * The `xorRailgun` function takes a 8 byte Uint8Array called `networkID` and performs XOR operation with a predefined
- * RAILGUN_ASCII array to produce an output Uint8Array.
- * @param {Uint8Array} networkID - Is a `Uint8Array` of 8 bytes that represents the network information containing type and id.
- * @returns Returns an 8-byte Uint8Array that is the result of
- * performing a bitwise XOR operation between each byte of the `networkID` Uint8Array and the
- * corresponding byte of the `RAILGUN_ASCII` array.
+ * The function `is0zk` in TypeScript asserts that a given string starts with a specific prefix
+ * indicating it is a Railgun address.
+ * @param {string} str - The `is0zk` function takes a string parameter `str` and asserts that it is of
+ * type `RailgunAddressLike`. The function checks if the string starts with the concatenation of
+ * `RAILGUN_ADDRESS_PREFIX` and "1". If the condition is not met, it throws
  */
-export const xorRailgun = (networkID: Uint8Array) => {
-  const xorOutput = new Uint8Array(8);
-
-  for (let i = 0; i < networkID.length; i++) {
-    xorOutput[i] = networkID[i]! ^ RAILGUN_ASCII[i]!;
-  }
-
-  return xorOutput;
-};
+export function is0zk(str: string): asserts str is RailgunAddressLike {
+  assert(
+    str.startsWith(RAILGUN_ADDRESS_PREFIX + "1"),
+    "Provided address must be 0zk1"
+  );
+}

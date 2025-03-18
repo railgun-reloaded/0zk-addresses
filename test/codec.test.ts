@@ -1,6 +1,7 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 import {
+  CHAIN_ID_ANY,
   ChainType,
   type AddressData,
   type RailgunAddressLike,
@@ -14,7 +15,7 @@ const testVectors = [
       0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
       0, 0, 0, 0, 0, 0, 0,
     ]),
-    chain: { type: ChainType.EVM, id: 1 },
+    chain: { type: ChainType.EVM, id: BigInt(1) },
     address:
       "0zk1qyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqunpd9kxwatwqyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqhshkca" as RailgunAddressLike,
     version: 1,
@@ -24,17 +25,7 @@ const testVectors = [
       0, 0, 1, 191, 213, 104, 28, 4, 121, 190, 154, 142, 248, 221, 139, 170,
       221, 151, 17, 88, 153, 169, 175, 48, 179, 210, 69, 88, 67, 175, 180, 27,
     ]),
-    chain: { type: ChainType.EVM, id: 56 },
-    address:
-      "0zk1qyqqqqdl645pcpreh6dga7xa3w4dm9c3tzv6ntesk0fy2kzr476pkunpd9kxwatw8qqqqqdl645pcpreh6dga7xa3w4dm9c3tzv6ntesk0fy2kzr476pkcsu8tp" as RailgunAddressLike,
-    version: 1,
-  },
-  {
-    pubkey: new Uint8Array([
-      0, 0, 1, 191, 213, 104, 28, 4, 121, 190, 154, 142, 248, 221, 139, 170,
-      221, 151, 17, 88, 153, 169, 175, 48, 179, 210, 69, 88, 67, 175, 180, 27,
-    ]),
-    chain: { type: 1, id: 56 },
+    chain: { type: 1, id: BigInt(56) },
     address:
       "0zk1qyqqqqdl645pcpreh6dga7xa3w4dm9c3tzv6ntesk0fy2kzr476pkumpd9kxwatw8qqqqqdl645pcpreh6dga7xa3w4dm9c3tzv6ntesk0fy2kzr476pkwrfm4m" as RailgunAddressLike,
     version: 1,
@@ -44,7 +35,7 @@ const testVectors = [
       0, 0, 1, 191, 213, 104, 28, 4, 121, 190, 154, 142, 248, 221, 139, 170,
       221, 151, 17, 88, 153, 169, 175, 48, 179, 210, 69, 88, 67, 175, 180, 27,
     ]),
-    chain: { type: ChainType.ANY, id: 0 },
+    chain: { type: ChainType.ANY, id: BigInt(0) },
     address:
       "0zk1qyqqqqdl645pcpreh6dga7xa3w4dm9c3tzv6ntesk0fy2kzr476phrtpd9kxwatwqqqqqqdl645pcpreh6dga7xa3w4dm9c3tzv6ntesk0fy2kzr476pk6xnyq6" as RailgunAddressLike,
     version: 1,
@@ -81,12 +72,12 @@ describe("Railgun Addresses Encoding & Decoding", () => {
     }, /Invalid checksum/);
   });
 
-  it("Should throw error on invalid address prefix", () => {
+  it("Should throw error on invalid address length", () => {
     assert.throws(() => {
       parse(
         "0zk1rgqyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqunpd9kxwatwqyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqsfhuuw"
       );
-    }, /Failed to decode bech32 address/);
+    }, /invalid string length/);
   });
 
   it("Should throw error on invalid viewingPublicKey length", () => {
@@ -101,7 +92,7 @@ describe("Railgun Addresses Encoding & Decoding", () => {
     const addressData: AddressData = {
       masterPublicKey,
       viewingPublicKey,
-      chain: { type: ChainType.EVM, id: 1 },
+      chain: { type: ChainType.EVM, id: BigInt(1) },
       version: 1,
     };
 
@@ -122,12 +113,44 @@ describe("Railgun Addresses Encoding & Decoding", () => {
     const addressData: AddressData = {
       masterPublicKey,
       viewingPublicKey,
-      chain: { type: ChainType.EVM, id: 1 },
+      chain: { type: ChainType.EVM, id: BigInt(1) },
       version: 1,
     };
 
     assert.throws(() => {
       stringify(addressData);
     }, /Invalid masterPublicKey length, expected 32 bytes/);
+  });
+
+  it("Should encode address data with chain info undefined and return chain info for any", () => {
+    const encodedAddress: RailgunAddressLike =
+      "0zk1qyqqqqdl645pcpreh6dga7xa3w4dm9c3tzv6ntesk0fy2kzr476phrv7j6fe3z53luqqqqdl645pcpreh6dga7xa3w4dm9c3tzv6ntesk0fy2kzr476pk26ds9v";
+    const originalAddressData: AddressData = {
+      masterPublicKey: new Uint8Array([
+        0, 0, 1, 191, 213, 104, 28, 4, 121, 190, 154, 142, 248, 221, 139, 170,
+        221, 151, 17, 88, 153, 169, 175, 48, 179, 210, 69, 88, 67, 175, 180, 27,
+      ]),
+      viewingPublicKey: new Uint8Array([
+        0, 0, 1, 191, 213, 104, 28, 4, 121, 190, 154, 142, 248, 221, 139, 170,
+        221, 151, 17, 88, 153, 169, 175, 48, 179, 210, 69, 88, 67, 175, 180, 27,
+      ]),
+      version: 1,
+      chain: undefined,
+    };
+    const expectedDecodedAddressData: AddressData = {
+      masterPublicKey: new Uint8Array([
+        0, 0, 1, 191, 213, 104, 28, 4, 121, 190, 154, 142, 248, 221, 139, 170,
+        221, 151, 17, 88, 153, 169, 175, 48, 179, 210, 69, 88, 67, 175, 180, 27,
+      ]),
+      viewingPublicKey: new Uint8Array([
+        0, 0, 1, 191, 213, 104, 28, 4, 121, 190, 154, 142, 248, 221, 139, 170,
+        221, 151, 17, 88, 153, 169, 175, 48, 179, 210, 69, 88, 67, 175, 180, 27,
+      ]),
+      version: 1,
+      chain: { type: ChainType.ANY, id: CHAIN_ID_ANY },
+    };
+
+    assert.strictEqual(encodedAddress, stringify(originalAddressData));
+    assert.deepStrictEqual(parse(encodedAddress), expectedDecodedAddressData);
   });
 });
