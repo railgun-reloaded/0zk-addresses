@@ -35,7 +35,10 @@
     const addressData = parse(recipientRailgunAddress);
     console.log("recipientRailgunAddress", recipientRailgunAddress);
     console.log('addressData', addressData)
-    /*
+```
+
+#### console output
+```sh 
       recipientRailgunAddress 0zk1q8hxknrs97q8pjxaagwthzc0df99rzmhl2xnlxmgv9akv32sua0kfrv7j6fe3z53llhxknrs97q8pjxaagwthzc0df99rzmhl2xnlxmgv9akv32sua0kg0zpzts
       addressData {
         version: 1,
@@ -53,7 +56,7 @@
         ],
         chain: { type: 255, id: 72057594037927935n }
       }
-    */
+    
 ```
 
 
