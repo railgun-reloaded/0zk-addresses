@@ -67,12 +67,10 @@ export function networkIDToChain(networkID: Uint8Array): Chain {
    * The chain type is determined by the most significant byte (shifted right by 56 bits),
    * and the chain ID is extracted from the remaining 56 bits using a bitwise AND operation.
    */
-  const chain: Chain = {
+  return {
     type: Number(bigIntDataNetwork >> 56n),
     id: bigIntDataNetwork & CHAIN_ID_MASK,
   };
-
-  return chain;
 }
 
 /**
@@ -86,8 +84,7 @@ export function chainToNetworkID(chain: Optional<Chain>): Uint8Array {
     return ALL_CHAINS_NETWORK_ID;
   }
 
-  const networkID = getChainFullNetworkID(chain);
-  return networkID;
+  return getChainFullNetworkID(chain);
 }
 
 /**

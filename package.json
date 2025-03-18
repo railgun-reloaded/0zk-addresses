@@ -11,7 +11,7 @@
   "author": "RAILGUN Project Contributors",
   "license": "MIT",
   "devDependencies": {
-    "@railgun-reloaded/tsconfig": "^1.0.0",
+    "@railgun-reloaded/tsconfig": "^1.0.1",
     "@types/node": "^22.13.10",
     "eslint": "^9.22.0",
     "typescript": "^5.8.2"

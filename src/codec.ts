@@ -24,14 +24,13 @@ export function parse(address: string): AddressData {
       .words
   );
 
-  const decodedAddress: AddressData = {
+  // Return decoded address
+  return {
     version: decodedData[0]!, // 1 byte
     masterPublicKey: decodedData.subarray(1, 33), // 32 bytes
     viewingPublicKey: decodedData.subarray(41, 73), // 32 bytes
     chain: networkIDToChain(decodedData.subarray(33, 41)), // 8 bytes
   };
-
-  return decodedAddress;
 }
 
 /**
@@ -61,12 +60,10 @@ export function stringify({
   addressBuffer.set(networkIDXor, 33); // 8 bytes (id: 7 bytes | type: 1 byte)
   addressBuffer.set(viewingPublicKey, 41); // 32 bytes
 
-  // Encode address
-  const encodedAddress = bech32m.encode(
+  // Return encode address
+  return bech32m.encode(
     RAILGUN_ADDRESS_PREFIX,
     bech32m.toWords(addressBuffer),
     ADDRESS_LENGTH_LIMIT
   );
-
-  return encodedAddress;
 }
