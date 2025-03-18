@@ -12,6 +12,7 @@ export const CURRENT_ADDRESS_VERSION = 0x01 as const;
 
 export enum ChainType {
   EVM = 0,
+  BSC = 1, // bsc evm uses type 1.
   ANY = 255,
 }
 
