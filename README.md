@@ -2,29 +2,33 @@
 
 > A simple module for encoding nd decoding RAILGUN formatted addresses
 
-## Example Usage
+## What is an RAILGUN Address?
+ ```ts
+  const addressStruct = {
+    masterPublicKey,  // (32 bytes) Uint8Array produced from deriving keys from your mnemonic
+    viewingPublicKey, // (32 bytes) Uint8Array produced from deriving keys from your mnemonic
+    chain,            // (8 bytes) {type: number, id: bigint}
+    version           // (1 byte) Address scheme version 
+  }
+ ```
+## How is a RAILGUN Address composed?
+```ts 
+  // 73 bytes concatenated
+  // example composotion, not proper byte construction.
+  addressBytes = versionBytes + masterPublicKeyBytes + networkInfoBytes + viewingPublicKeyBytes;
+  
 
-```ts
-// Using parse() to decode
-const originalAddress: RailgunAddressLike =
-  "0zk1q8hxknrs97q8pjxaagwthzc0df99rzmhl2xnlxmgv9akv32sua0kfrv7j6fe3z53llhxknrs97q8pjxaagwthzc0df99rzmhl2xnlxmgv9akv32sua0kg0zpzts";
-const parsedAddress: AddressData = parse(originalAddress);
-
-// Using stringify() to encode
-const originalDecodedAddress: AddressData = {
-  masterPublicKey:
-    107840038155987585452015163184318756879563730268045790440630167370538141835108n,
-  viewingPublicKey: new Uint8Array([
-    238, 107, 76, 112, 47, 128, 112, 200, 221, 234, 28, 187, 139, 15, 106, 74,
-    81, 139, 119, 250, 141, 63, 155, 104, 97, 123, 102, 69, 80, 231, 95, 100,
-  ]),
-  version: 1,
-  chain: { type: ChainType.EVM, id: BigInt(56) },
-};
-const stringifiedAddress: RailgunAddressLike = stringify(
-  originalDecodedAddress
-);
 ```
+## How is a RAILGUN Address Encoded? 
+```ts
+  bech32m.encode(
+      RAILGUN_ADDRESS_PREFIX, // 0zk
+      bech32m.toWords(addressBuffer),
+      ADDRESS_LENGTH_LIMIT // RAILGUN addresses are a length of 127
+    );
+```
+
+
 
 ## Install
 
