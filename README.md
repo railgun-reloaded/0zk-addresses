@@ -5,12 +5,12 @@
 ## Install
 
 ```sh
-npm install  @railgun-reloaded/0zk-addresses
+npm install @railgun-reloaded/0zk-addresses
 ```
 
 ## Example Usage
 
-### `parsing`
+### `parse`
 
 ```ts
 import { parse } from "@railgun-reloaded/0zk-addresses";
@@ -50,25 +50,28 @@ main();
 ```
 
 ### `stringify`
+
 ```ts
-import { stringify, CHAIN_ID_ANY, type ChainType,} from "@railgun-reloaded/0zk-addresses";
+import {
+  stringify,
+  CHAIN_ID_ANY,
+  type ChainType,
+} from "@railgun-reloaded/0zk-addresses";
 
 function main() {
   const railgunAddressData = {
-        masterPublicKey: Uint8Array(32) [
-          238, 107,  76, 112,  47, 128, 112, 200,
-          221, 234,  28, 187, 139,  15, 106,  74,
-          81, 139, 119, 250, 141,  63, 155, 104,
-          97, 123, 102,  69,  80, 231,  95, 100
-        ],
-        viewingPublicKey: Uint8Array(32) [
-          238, 107,  76, 112,  47, 128, 112, 200,
-          221, 234,  28, 187, 139,  15, 106,  74,
-          81, 139, 119, 250, 141,  63, 155, 104,
-          97, 123, 102,  69,  80, 231,  95, 100
-        ],
-        chain: { type: ChainType.ALL, id: CHAIN_ID_ANY },
-        version: 1
+    masterPublicKey:
+      new Uint8Array([
+      238, 107, 76, 112, 47, 128, 112, 200, 221, 234, 28, 187, 139, 15, 106, 74,
+      81, 139, 119, 250, 141, 63, 155, 104, 97, 123, 102, 69, 80, 231, 95, 100,
+    ]);
+    viewingPublicKey:
+    new Uint8Array([
+      238, 107, 76, 112, 47, 128, 112, 200, 221, 234, 28, 187, 139, 15, 106, 74,
+      81, 139, 119, 250, 141, 63, 155, 104, 97, 123, 102, 69, 80, 231, 95, 100,
+    ]);
+    chain: { type: ChainType.ANY, id: CHAIN_ID_ANY },
+    version: 1,
   };
   const stringifiedAddress = stringify(railgunAddressData);
 
@@ -100,6 +103,7 @@ main();
         chain: { type: 255, id: 72057594037927935n }
       }
 ```
+
 ## Deep Understanding
 
 ### How is a RAILGUN Address composed?
