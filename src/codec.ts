@@ -19,6 +19,7 @@ export function parse(address: string): AddressData {
   // Check if the address is a RAILGUN address
   is0zk(address);
 
+  // bench32m.decode will throw an error if the address is invalid
   const decodedData = bech32m.fromWords(
     bech32m.decode<typeof RAILGUN_ADDRESS_PREFIX>(address, ADDRESS_LENGTH_LIMIT)
       .words

@@ -1,44 +1,35 @@
 # `@railgun-reloaded/0zk-addresses`
 
-> A simple module for encoding nd decoding RAILGUN formatted addresses
+> A simple module for encoding and decoding RAILGUN formatted addresses
 
-## What is an RAILGUN Address?
- ```ts
-  const addressStruct = {
-    masterPublicKey,  // (32 bytes) Uint8Array produced from deriving keys from your mnemonic
-    viewingPublicKey, // (32 bytes) Uint8Array produced from deriving keys from your mnemonic
-    chain,            // (8 bytes) {type: number, id: bigint}
-    version           // (1 byte) Address scheme version 
-  }
- ```
-## How is a RAILGUN Address composed?
-```ts 
-  // 73 bytes concatenated
-  // (pseudocode example composotion, not proper byte construction.)
-  addressBytes = versionBytes + masterPublicKeyBytes + networkInfoBytes + viewingPublicKeyBytes;
-  
+## Install
 
+```sh
+npm install  @railgun-reloaded/0zk-addresses
 ```
-## How is a RAILGUN Address Encoded? 
+
+## Example Usage
+
+### `parsing`
+
 ```ts
-  bech32m.encode(
-      RAILGUN_ADDRESS_PREFIX,         // 0zk
-      bech32m.toWords(addressBuffer), // properly composed address byte array
-      ADDRESS_LENGTH_LIMIT            // RAILGUN addresses are a length of 127
-    );
+import { parse } from "@railgun-reloaded/0zk-addresses";
+
+function main() {
+  const recipientRailgunAddress =
+    "0zk1q8hxknrs97q8pjxaagwthzc0df99rzmhl2xnlxmgv9akv32sua0kfrv7j6fe3z53llhxknrs97q8pjxaagwthzc0df99rzmhl2xnlxmgv9akv32sua0kg0zpzts";
+  const addressData = parse(recipientRailgunAddress);
+
+  console.log("recipientRailgunAddress", recipientRailgunAddress);
+  console.log("addressData", addressData);
+}
+
+main();
 ```
 
-## Example Parsing address 
-```ts
-    import { parse } from "@railgun-reloaded/0zk-addresses"
-    const recipientRailgunAddress = "0zk1q8hxknrs97q8pjxaagwthzc0df99rzmhl2xnlxmgv9akv32sua0kfrv7j6fe3z53llhxknrs97q8pjxaagwthzc0df99rzmhl2xnlxmgv9akv32sua0kg0zpzts";
-    const addressData = parse(recipientRailgunAddress);
-    console.log("recipientRailgunAddress", recipientRailgunAddress);
-    console.log('addressData', addressData)
-```
+#### Output
 
-#### console output
-```sh 
+```sh
       recipientRailgunAddress 0zk1q8hxknrs97q8pjxaagwthzc0df99rzmhl2xnlxmgv9akv32sua0kfrv7j6fe3z53llhxknrs97q8pjxaagwthzc0df99rzmhl2xnlxmgv9akv32sua0kg0zpzts
       addressData {
         version: 1,
@@ -56,14 +47,37 @@
         ],
         chain: { type: 255, id: 72057594037927935n }
       }
-    
 ```
 
+## Deep Understanding
 
-## Install
+### How is a RAILGUN Address composed?
 
-```sh
-npm install  @railgun-reloaded/0zk-addresses
+- RAILGUN addresses are 73 bytes concatenated
+
+```ts
+// Pseudocode example composition, not proper byte construction.
+addressBytes =
+  versionByte + masterPublicKeyBytes + networkInfoBytes + viewingPublicKeyBytes;
+
+addressStruct = {
+  version, // number - Address scheme version (1 byte)
+  masterPublicKey, // Uint8Array - Produced from deriving keys from your mnemonic (32 bytes)
+  chain, // { type: number, id: bigint } - (8 bytes; type = 1 byte; id = 7 bytes)
+  viewingPublicKey, // Uint8Array - Produced from deriving keys from your mnemonic (32 bytes)
+};
+```
+
+### How is a RAILGUN Address Encoded?
+
+- RAILGUN addresses are encoded using `bech32m.encode()` with the `0zk` prefix and a fixed length of 127.
+
+```ts
+bech32m.encode(
+  RAILGUN_ADDRESS_PREFIX, // "0zk"
+  bech32m.toWords(addressBuffer), // Properly composed address byte array
+  ADDRESS_LENGTH_LIMIT // 127
+);
 ```
 
 ## License
