@@ -1,6 +1,6 @@
 {
   "name": "@railgun-reloaded/0zk-addresses",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "A simple module for encoding and decoding railgun formatted addresses",
   "homepage": "https://github.com/railgun-reloaded/0zk-addresses#readme",
   "bugs": {
