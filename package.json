@@ -1,22 +1,33 @@
 {
   "name": "@railgun-reloaded/0zk-addresses",
-  "version": "1.0.0",
+  "version": "0.0.0",
   "description": "A simple module for encoding and decoding railgun formatted addresses",
+  "homepage": "https://github.com/railgun-reloaded/0zk-addresses#readme",
+  "bugs": {
+    "url": "https://github.com/railgun-reloaded/0zk-addresses/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/railgun-reloaded/0zk-addresses.git"
+  },
+  "license": "MIT",
+  "author": "RAILGUN Project Contributors",
   "main": "src/index.js",
+  "directories": {
+    "test": "test"
+  },
   "scripts": {
     "build": "tsc --build",
     "clean": "tsc --build --clean",
     "test": "npm run build && node --test ./test/*.test.js"
   },
-  "author": "RAILGUN Project Contributors",
-  "license": "MIT",
+  "dependencies": {
+    "@scure/base": "^1.2.4"
+  },
   "devDependencies": {
     "@railgun-reloaded/tsconfig": "^1.0.1",
     "@types/node": "^22.13.10",
     "eslint": "^9.22.0",
     "typescript": "^5.8.2"
-  },
-  "dependencies": {
-    "@scure/base": "^1.2.4"
   }
 }
