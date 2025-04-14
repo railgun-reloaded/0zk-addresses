@@ -1,7 +1,6 @@
 # npm installed local dependencies
 node_modules
-src/**/*.js
-test/**/*.js
+*.js
 
 # Editor directories and files
 .vscode/*

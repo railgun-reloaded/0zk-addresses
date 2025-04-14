@@ -1,4 +1,3 @@
 {
-  "extends": ["@railgun-reloaded/tsconfig/tsconfig"],
-  "include": ["globals.d.ts", "src/**/*.ts", "test/**/*.ts"]
+  "extends": ["@railgun-reloaded/tsconfig/tsconfig"]
 }

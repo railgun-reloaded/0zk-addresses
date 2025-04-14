@@ -1,2 +1,2 @@
-export * from "./codec";
-export * from "./definitions";
+export * from './codec'
+export * from './definitions'

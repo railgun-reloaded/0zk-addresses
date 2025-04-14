@@ -17,6 +17,8 @@
     "test": "test"
   },
   "scripts": {
+    "lint": "eslint",
+    "lint:fix": "eslint --fix",
     "build": "tsc --build",
     "clean": "tsc --build --clean",
     "test": "npm run build && node --test ./test/*.test.js",
@@ -26,7 +28,8 @@
     "@scure/base": "^1.2.4"
   },
   "devDependencies": {
-    "@railgun-reloaded/tsconfig": "^1.0.1",
+    "@railgun-reloaded/eslint-config": "^1.1.0",
+    "@railgun-reloaded/tsconfig": "^1.2.0",
     "@types/node": "^22.13.10",
     "eslint": "^9.22.0",
     "typescript": "^5.8.2"
