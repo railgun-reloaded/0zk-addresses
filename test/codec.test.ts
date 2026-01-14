@@ -156,4 +156,107 @@ describe('Railgun Addresses Encoding & Decoding', () => {
     assert.strictEqual(encodedAddress, stringify(originalAddressData))
     assert.deepStrictEqual(parse(encodedAddress), expectedDecodedAddressData)
   })
+
+  it('Should throw error on unsupported version', () => {
+    assert.throws(() => {
+      stringify({
+        masterPublicKey: new Uint8Array(32).fill(0),
+        viewingPublicKey: new Uint8Array(32).fill(0),
+        chain: { type: ChainType.EVM, id: BigInt(1) },
+        version: 2,
+      })
+    }, /Unsupported address version 2/)
+  })
+
+  it('Should handle maximum valid chain ID', () => {
+    const maxChainID = 0x00ff_ffff_ffff_ffffn // CHAIN_ID_MASK
+    const addressData: AddressData = {
+      masterPublicKey: new Uint8Array(32).fill(1),
+      viewingPublicKey: new Uint8Array(32).fill(2),
+      chain: { type: ChainType.EVM, id: maxChainID },
+      version: 1,
+    }
+
+    const encoded = stringify(addressData)
+    const decoded = parse(encoded)
+
+    assert.strictEqual(decoded.chain?.id, maxChainID)
+    assert.strictEqual(decoded.chain?.type, ChainType.EVM)
+  })
+
+  it('Should handle zero chain ID', () => {
+    const addressData: AddressData = {
+      masterPublicKey: new Uint8Array(32).fill(3),
+      viewingPublicKey: new Uint8Array(32).fill(4),
+      chain: { type: ChainType.EVM, id: 0n },
+      version: 1,
+    }
+
+    const encoded = stringify(addressData)
+    const decoded = parse(encoded)
+
+    assert.strictEqual(decoded.chain?.id, 0n)
+    assert.strictEqual(decoded.chain?.type, ChainType.EVM)
+  })
+
+  it('Should handle common EVM chain IDs', () => {
+    const chains = [
+      { name: 'Polygon', id: 137n },
+      { name: 'Arbitrum', id: 42161n },
+      { name: 'Optimism', id: 10n },
+      { name: 'Base', id: 8453n },
+    ]
+
+    for (const { name, id } of chains) {
+      const addressData: AddressData = {
+        masterPublicKey: new Uint8Array(32).fill(5),
+        viewingPublicKey: new Uint8Array(32).fill(6),
+        chain: { type: ChainType.EVM, id },
+        version: 1,
+      }
+
+      const encoded = stringify(addressData)
+      const decoded = parse(encoded)
+
+      assert.strictEqual(decoded.chain?.id, id, `Failed for ${name}`)
+      assert.strictEqual(decoded.chain?.type, ChainType.EVM, `Failed for ${name}`)
+    }
+  })
+
+  it('Should handle different master and viewing keys', () => {
+    const addressData: AddressData = {
+      masterPublicKey: new Uint8Array([
+        1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
+        17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32,
+      ]),
+      viewingPublicKey: new Uint8Array([
+        32, 31, 30, 29, 28, 27, 26, 25, 24, 23, 22, 21, 20, 19, 18, 17,
+        16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1,
+      ]),
+      chain: { type: ChainType.EVM, id: 1n },
+      version: 1,
+    }
+
+    const encoded = stringify(addressData)
+    const decoded = parse(encoded)
+
+    assert.deepStrictEqual(decoded.masterPublicKey, addressData.masterPublicKey)
+    assert.deepStrictEqual(decoded.viewingPublicKey, addressData.viewingPublicKey)
+    assert.notDeepStrictEqual(decoded.masterPublicKey, decoded.viewingPublicKey)
+  })
+
+  it('Should handle all 0xFF bytes in keys', () => {
+    const addressData: AddressData = {
+      masterPublicKey: new Uint8Array(32).fill(0xff),
+      viewingPublicKey: new Uint8Array(32).fill(0xff),
+      chain: { type: ChainType.EVM, id: 1n },
+      version: 1,
+    }
+
+    const encoded = stringify(addressData)
+    const decoded = parse(encoded)
+
+    assert.deepStrictEqual(decoded.masterPublicKey, addressData.masterPublicKey)
+    assert.deepStrictEqual(decoded.viewingPublicKey, addressData.viewingPublicKey)
+  })
 })
