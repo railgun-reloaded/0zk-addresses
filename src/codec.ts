@@ -25,9 +25,16 @@ function parse (address: string): AddressData {
       .words
   )
 
+  const version = decodedData[0]!
+  if (version !== CURRENT_ADDRESS_VERSION) {
+    throw new Error(
+      `Unsupported address version ${version}, expected ${CURRENT_ADDRESS_VERSION}`
+    )
+  }
+
   // Return decoded address
   return {
-    version: decodedData[0]!, // 1 byte
+    version, // 1 byte
     masterPublicKey: decodedData.subarray(1, 33), // 32 bytes
     viewingPublicKey: decodedData.subarray(41, 73), // 32 bytes
     chain: networkIDToChain(decodedData.subarray(33, 41)), // 8 bytes
@@ -49,6 +56,11 @@ function stringify ({
   chain = { type: ChainType.ANY, id: CHAIN_ID_ANY },
   version = CURRENT_ADDRESS_VERSION,
 }: AddressData): RailgunAddressLike {
+  if (version !== CURRENT_ADDRESS_VERSION) {
+    throw new Error(
+      `Unsupported address version ${version}, expected ${CURRENT_ADDRESS_VERSION}`
+    )
+  }
   if (masterPublicKey.length !== 32) {
     throw new Error('Invalid masterPublicKey length, expected 32 bytes')
   }
@@ -66,7 +78,6 @@ function stringify ({
   addressBuffer.set(networkIDXor, 33) // 8 bytes (id: 7 bytes | type: 1 byte)
   addressBuffer.set(viewingPublicKey, 41) // 32 bytes
 
-  // Return encode address
   return bech32m.encode(
     RAILGUN_ADDRESS_PREFIX,
     bech32m.toWords(addressBuffer),
