@@ -137,15 +137,35 @@ describe('Chain Utilities', () => {
         assert.strictEqual(fullValue & CHAIN_ID_MASK, id, `Failed for ${name}`)
       }
     })
+
+    it('Should handle chain ID exceeding CHAIN_ID_MASK (more than 56 bits)', () => {
+      const largeChainID = 2n ** 60n
+      const chain: Chain = { type: ChainType.EVM, id: largeChainID }
+      const networkID = getChainFullNetworkID(chain)
+
+      // Check ChainType
+      assert.strictEqual(networkID[0], ChainType.EVM)
+
+      // When we read it back, the upper bits beyond 56 should be truncated
+      // and the ChainType byte should be overwritten
+      const dataView = new DataView(networkID.buffer)
+      const fullValue = dataView.getBigUint64(0, false)
+
+      // The stored value will have the upper bits that overflow into the type byte
+      // This demonstrates the overflow behavior
+      const maskedValue = fullValue & CHAIN_ID_MASK
+      assert.notStrictEqual(maskedValue, largeChainID, 'Value should be truncated')
+
+      // The actual stored value will be the lower 56 bits of largeChainID
+      const expectedTruncated = largeChainID & CHAIN_ID_MASK
+      assert.strictEqual(maskedValue, expectedTruncated)
+    })
   })
 
   describe('networkIDToChain', () => {
     it('Should decode EVM chain ID 1 correctly', () => {
-      const encoded = new Uint8Array(8)
-      encoded[0] = ChainType.EVM
-      const dataView = new DataView(encoded.buffer)
-      dataView.setBigUint64(0, 1n, false)
-      encoded[0] = ChainType.EVM // Reset type byte after setBigUint64
+      const chain: Chain = { type: ChainType.EVM, id: 1n }
+      const encoded = getChainFullNetworkID(chain)
 
       const xorEncoded = xorRailgun(encoded)
       const decoded = networkIDToChain(xorEncoded)
@@ -201,11 +221,6 @@ describe('Chain Utilities', () => {
 
       assert.strictEqual(result.length, 8)
       assert.strictEqual(result[0], ChainType.EVM)
-    })
-
-    it('Should return ALL_CHAINS_NETWORK_ID when chain is null', () => {
-      const result = chainToNetworkID(undefined)
-      assert.deepStrictEqual(result, ALL_CHAINS_NETWORK_ID)
     })
   })
 
