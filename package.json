@@ -20,9 +20,12 @@
     "lint": "eslint",
     "lint:fix": "eslint --fix",
     "build": "tsc --build",
+    "build:nocheck": "tsc --noEmitOnError false",
     "clean": "tsc --build --clean",
     "test": "npm run build && node --test ./test/*.test.js",
-    "test-only": "npm run build && node --test-only ./test/*.test.js"
+    "test:debug": "npm run build:nocheck && DEBUG=0zk-addresses:* node --test ./test/*.test.js",
+    "test:only": "npm run build && node --test-only ./test/*.test.js",
+    "test:only:debug": "npm run build:nocheck && DEBUG=0zk-addresses:* node --test-only ./test/*.test.js"
   },
   "dependencies": {
     "@scure/base": "^1.2.4"
