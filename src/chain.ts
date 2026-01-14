@@ -1,14 +1,11 @@
 import assert from 'node:assert/strict'
 
-import type {
-  Chain,
-  RailgunAddressLike
-} from './definitions'
+import type { Chain, RailgunAddressLike } from './definitions'
 import {
   ALL_CHAINS_NETWORK_ID,
   CHAIN_ID_MASK,
   RAILGUN_ADDRESS_PREFIX,
-  RAILGUN_ASCII
+  RAILGUN_ASCII,
 } from './definitions'
 
 /**
@@ -84,7 +81,7 @@ function networkIDToChain (networkID: Uint8Array): Chain {
  * @param chain - The `chain` parameter is an optional value that represents network information.
  * @returns Returns a `Uint8Array` value, which is either the encoded networkID of the provided `chain` or a default value `ALL_CHAINS_NETWORK_ID` if the `chain` is `null`.
  */
-function chainToNetworkID (chain: Optional<Chain>): Uint8Array {
+function chainToNetworkID (chain?: Chain): Uint8Array {
   if (chain == null) {
     return ALL_CHAINS_NETWORK_ID
   }
@@ -111,5 +108,5 @@ export {
   getChainFullNetworkID,
   networkIDToChain,
   chainToNetworkID,
-  is0zk
+  is0zk,
 }

@@ -23,8 +23,8 @@ type RailgunAddressLike = `${typeof RAILGUN_ADDRESS_PREFIX}1${string}`
 type AddressData = {
   masterPublicKey: Uint8Array;
   viewingPublicKey: Uint8Array;
-  chain?: Optional<Chain>;
-  version?: Optional<number>;
+  chain?: Chain | undefined;
+  version?: number | undefined;
 }
 
 export type { Chain, RailgunAddressLike, AddressData }
