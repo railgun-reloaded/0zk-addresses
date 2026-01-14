@@ -125,8 +125,7 @@ describe('Chain Utilities', () => {
         { name: 'Ethereum', type: ChainType.EVM, id: 1n },
         { name: 'Polygon', type: ChainType.EVM, id: 137n },
         { name: 'Arbitrum', type: ChainType.EVM, id: 42161n },
-        { name: 'Optimism', type: ChainType.EVM, id: 10n },
-        { name: 'Base', type: ChainType.EVM, id: 8453n },
+        { name: 'BSC', type: ChainType.EVM, id: 56n },
       ]
 
       for (const { name, type, id } of chains) {

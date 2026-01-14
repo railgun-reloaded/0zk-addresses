@@ -203,8 +203,7 @@ describe('Railgun Addresses Encoding & Decoding', () => {
     const chains = [
       { name: 'Polygon', id: 137n },
       { name: 'Arbitrum', id: 42161n },
-      { name: 'Optimism', id: 10n },
-      { name: 'Base', id: 8453n },
+      { name: 'BSC', id: 56n },
     ]
 
     for (const { name, id } of chains) {
