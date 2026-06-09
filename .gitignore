@@ -1,6 +1,7 @@
 # npm installed local dependencies
 node_modules
 *.js
+*.d.ts
 
 # Editor directories and files
 .vscode/*
