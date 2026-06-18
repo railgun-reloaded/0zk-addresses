@@ -1,12 +1,12 @@
 import assert from 'node:assert/strict'
 
-import type { Chain, RailgunAddressLike } from './definitions'
+import type { Chain, RailgunAddressLike } from './definitions.js'
 import {
   ALL_CHAINS_NETWORK_ID,
   CHAIN_ID_MASK,
   RAILGUN_ADDRESS_PREFIX,
   RAILGUN_ASCII,
-} from './definitions'
+} from './definitions.js'
 
 /**
  * The `xorRailgun` function takes a 8 byte Uint8Array called `networkID` and performs XOR operation with a predefined

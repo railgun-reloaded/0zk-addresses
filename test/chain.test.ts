@@ -7,15 +7,15 @@ import {
   is0zk,
   networkIDToChain,
   xorRailgun,
-} from '../src/chain'
-import type { Chain } from '../src/definitions'
+} from '../src/chain.js'
+import type { Chain } from '../src/definitions.js'
 import {
   ALL_CHAINS_NETWORK_ID,
   CHAIN_ID_ANY,
   CHAIN_ID_MASK,
   ChainType,
   RAILGUN_ASCII,
-} from '../src/definitions'
+} from '../src/definitions.js'
 
 describe('Chain Utilities', () => {
   describe('xorRailgun', () => {

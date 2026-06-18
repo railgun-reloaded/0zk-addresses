@@ -1,16 +1,16 @@
 import assert from 'node:assert/strict'
 import { describe, it } from 'node:test'
 
-import { parse, stringify } from '../src'
 import type {
   AddressData,
   RailgunAddressLike
-} from '../src/definitions'
+} from '../src/definitions.js'
 import {
   ADDRESS_LENGTH_LIMIT,
   CHAIN_ID_ANY,
   ChainType,
-} from '../src/definitions'
+} from '../src/definitions.js'
+import { parse, stringify } from '../src/index.js'
 
 const testVectors = [
   {
