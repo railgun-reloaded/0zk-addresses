@@ -8,7 +8,7 @@ import {
   networkIDToChain,
   xorRailgun,
 } from '../src/chain.js'
-import type { Chain } from '../src/definitions.js'
+import type { Chain, RailgunAddressLike } from '../src/definitions.js'
 import {
   ALL_CHAINS_NETWORK_ID,
   CHAIN_ID_ANY,
@@ -16,6 +16,7 @@ import {
   ChainType,
   RAILGUN_ASCII,
 } from '../src/definitions.js'
+import { RailgunAddressError } from '../src/errors.js'
 
 describe('Chain Utilities', () => {
   describe('xorRailgun', () => {
@@ -272,6 +273,32 @@ describe('Chain Utilities', () => {
       assert.throws(() => {
         is0zk('0zk')
       }, /must be 0zk1/)
+    })
+
+    it('Should throw on misleading embedded "0zk1" not at the start', () => {
+      assert.throws(() => {
+        is0zk('x0zk1qyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqunpd')
+      }, /must be 0zk1/)
+    })
+
+    it('Should throw a RailgunAddressError instance with the expected message', () => {
+      assert.throws(
+        () => {
+          is0zk('not-an-address')
+        },
+        (error: unknown) => {
+          assert.ok(error instanceof RailgunAddressError)
+          assert.strictEqual(error.message, 'Provided address must be 0zk1')
+          return true
+        }
+      )
+    })
+
+    it('Should narrow the type to RailgunAddressLike on valid input', () => {
+      const candidate = '0zk1qyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqunpd9kxwatwqyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqhshkca' as string
+      is0zk(candidate)
+      const narrowed: RailgunAddressLike = candidate
+      assert.ok(narrowed.startsWith('0zk1'))
     })
   })
 })

@@ -1,5 +1,3 @@
-import assert from 'node:assert/strict'
-
 import type { Chain, RailgunAddressLike } from './definitions.js'
 import {
   ALL_CHAINS_NETWORK_ID,
@@ -7,6 +5,7 @@ import {
   RAILGUN_ADDRESS_PREFIX,
   RAILGUN_ASCII,
 } from './definitions.js'
+import { RailgunAddressError } from './errors.js'
 
 /**
  * The `xorRailgun` function takes a 8 byte Uint8Array called `networkID` and performs XOR operation with a predefined
@@ -97,10 +96,9 @@ function chainToNetworkID (chain?: Chain): Uint8Array {
  * `RAILGUN_ADDRESS_PREFIX` and "1". If the condition is not met, it throws
  */
 function is0zk (str: string): asserts str is RailgunAddressLike {
-  assert(
-    str.startsWith(RAILGUN_ADDRESS_PREFIX + '1'),
-    'Provided address must be 0zk1'
-  )
+  if (!str.startsWith(RAILGUN_ADDRESS_PREFIX + '1')) {
+    throw new RailgunAddressError('Provided address must be 0zk1')
+  }
 }
 
 export {
