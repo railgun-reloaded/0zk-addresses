@@ -9,25 +9,45 @@ import {
   ChainType,
   RAILGUN_ADDRESS_PREFIX,
 } from './definitions.js'
+import { RailgunAddressError } from './errors.js'
 
 /**
  * The `parse` function decodes the encoded RAILGUN address using Bech32 and returns the decoded data.
  * @param address - The `address` parameter is of type `RailgunAddressLike` and its the encoded RAILGUN address.
  * @returns - Returns `addressData` object with the data decoded.
+ * @throws {RailgunAddressError} With code `InvalidPrefix`, `InvalidChecksum`, `InvalidLength`, or `UnsupportedVersion`.
  */
 function parse (address: string): AddressData {
   // Check if the address is a RAILGUN address
   is0zk(address)
 
-  // bench32m.decode will throw an error if the address is invalid
-  const decodedData = bech32m.fromWords(
-    bech32m.decode<typeof RAILGUN_ADDRESS_PREFIX>(address, ADDRESS_LENGTH_LIMIT)
-      .words
-  )
+  // Decode the bech32m body, mapping decode failures to a typed error code.
+  let decodedData: Uint8Array
+  try {
+    decodedData = bech32m.fromWords(
+      bech32m.decode<typeof RAILGUN_ADDRESS_PREFIX>(address, ADDRESS_LENGTH_LIMIT)
+        .words
+    )
+  } catch (cause) {
+    const detail = cause instanceof Error ? cause.message : String(cause)
+    if (/length/i.test(detail)) {
+      throw new RailgunAddressError(
+        'InvalidLength',
+        `Address length out of bounds: ${detail}`,
+        { cause }
+      )
+    }
+    throw new RailgunAddressError(
+      'InvalidChecksum',
+      `Address failed bech32m decoding: ${detail}`,
+      { cause }
+    )
+  }
 
   const version = decodedData[0]!
   if (version !== CURRENT_ADDRESS_VERSION) {
-    throw new Error(
+    throw new RailgunAddressError(
+      'UnsupportedVersion',
       `Unsupported address version ${version}, expected ${CURRENT_ADDRESS_VERSION}`
     )
   }
@@ -49,6 +69,7 @@ function parse (address: string): AddressData {
  * @param addressData.chain - The chain information for the address.
  * @param addressData.version - The version of the address format.
  * @returns - Returns a string that represents the encoded address.
+ * @throws {RailgunAddressError} With code `UnsupportedVersion`, `InvalidMasterPublicKeyLength`, or `InvalidViewingPublicKeyLength`.
  */
 function stringify ({
   masterPublicKey,
@@ -57,15 +78,22 @@ function stringify ({
   version = CURRENT_ADDRESS_VERSION,
 }: AddressData): RailgunAddressLike {
   if (version !== CURRENT_ADDRESS_VERSION) {
-    throw new Error(
+    throw new RailgunAddressError(
+      'UnsupportedVersion',
       `Unsupported address version ${version}, expected ${CURRENT_ADDRESS_VERSION}`
     )
   }
   if (masterPublicKey.length !== 32) {
-    throw new Error('Invalid masterPublicKey length, expected 32 bytes')
+    throw new RailgunAddressError(
+      'InvalidMasterPublicKeyLength',
+      'Invalid masterPublicKey length, expected 32 bytes'
+    )
   }
   if (viewingPublicKey.length !== 32) {
-    throw new Error('Invalid viewingPublicKey length, expected 32 bytes')
+    throw new RailgunAddressError(
+      'InvalidViewingPublicKeyLength',
+      'Invalid viewingPublicKey length, expected 32 bytes'
+    )
   }
 
   // Create 73 byte address buffer (version || masterPublicKey || networkID || viewingPublicKey)

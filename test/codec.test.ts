@@ -10,6 +10,7 @@ import {
   CHAIN_ID_ANY,
   ChainType,
 } from '../src/definitions.js'
+import { RailgunAddressError } from '../src/errors.js'
 import { parse, stringify } from '../src/index.js'
 
 const testVectors = [
@@ -68,19 +69,33 @@ describe('Railgun Addresses Encoding & Decoding', () => {
   })
 
   it('Should throw error on invalid address checksum', () => {
-    assert.throws(() => {
-      parse(
-        '0zk1pnj7u66vwqhcquxgmh4pewutpa4y55vtwlag60umdpshkej92rn47ey76ges3t3enn'
-      )
-    }, /Invalid checksum/)
+    assert.throws(
+      () => {
+        parse(
+          '0zk1pnj7u66vwqhcquxgmh4pewutpa4y55vtwlag60umdpshkej92rn47ey76ges3t3enn'
+        )
+      },
+      (error: unknown) => {
+        assert.ok(error instanceof RailgunAddressError)
+        assert.strictEqual(error.code, 'InvalidChecksum')
+        return true
+      }
+    )
   })
 
   it('Should throw error on invalid address length', () => {
-    assert.throws(() => {
-      parse(
-        '0zk1rgqyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqunpd9kxwatwqyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqsfhuuw'
-      )
-    }, /invalid string length/)
+    assert.throws(
+      () => {
+        parse(
+          '0zk1rgqyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqunpd9kxwatwqyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqsfhuuw'
+        )
+      },
+      (error: unknown) => {
+        assert.ok(error instanceof RailgunAddressError)
+        assert.strictEqual(error.code, 'InvalidLength')
+        return true
+      }
+    )
   })
 
   it('Should throw error on invalid viewingPublicKey length', () => {

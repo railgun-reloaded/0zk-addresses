@@ -97,7 +97,7 @@ function chainToNetworkID (chain?: Chain): Uint8Array {
  */
 function is0zk (str: string): asserts str is RailgunAddressLike {
   if (!str.startsWith(RAILGUN_ADDRESS_PREFIX + '1')) {
-    throw new RailgunAddressError('Provided address must be 0zk1')
+    throw new RailgunAddressError('InvalidPrefix', 'Provided address must be 0zk1')
   }
 }
 
