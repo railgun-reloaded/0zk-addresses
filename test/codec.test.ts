@@ -98,6 +98,19 @@ describe('Railgun Addresses Encoding & Decoding', () => {
     )
   })
 
+  it('Should throw error on short address payload', () => {
+    assert.throws(
+      () => {
+        parse('0zk1qy4pnm9q')
+      },
+      (error: unknown) => {
+        assert.ok(error instanceof RailgunAddressError)
+        assert.strictEqual(error.code, 'InvalidLength')
+        return true
+      }
+    )
+  })
+
   it('Should throw error on invalid viewingPublicKey length', () => {
     const viewingPublicKey = new Uint8Array([
       0, 0, 1, 191, 213, 104, 28, 4, 121, 190, 154, 142, 248, 221, 139, 170,

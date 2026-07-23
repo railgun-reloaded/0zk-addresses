@@ -44,6 +44,14 @@ function parse (address: string): AddressData {
     )
   }
 
+  // The payload must be exactly 73 bytes (version || masterPublicKey || networkID || viewingPublicKey)
+  if (decodedData.length !== 73) {
+    throw new RailgunAddressError(
+      'InvalidLength',
+      `Invalid address payload length ${decodedData.length}, expected 73 bytes`
+    )
+  }
+
   const version = decodedData[0]!
   if (version !== CURRENT_ADDRESS_VERSION) {
     throw new RailgunAddressError(
